@@ -5,7 +5,7 @@
 [![Crates.io](https://img.shields.io/crates/v/dioxus-leaflet.svg)](https://crates.io/crates/dioxus-leaflet)
 [![Documentation](https://docs.rs/dioxus-leaflet/badge.svg)](https://docs.rs/dioxus-leaflet)
 
-A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](https://dioxuslabs.com/) applications. This library provides an easy-to-use, reactive map component that integrates seamlessly with Dioxus applications.
+A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](https://dioxuslabs.com/) applications. This crate provides an easy-to-use, reactive map component that integrates seamlessly with Dioxus applications.
 
 ## Features
 
@@ -343,4 +343,4 @@ at your option.
 
 ---
 
-**Note**: This library requires an internet connection to load Leaflet CSS and JavaScript from CDN. If you need offline support, consider hosting the Leaflet files locally and modifying the component accordingly.
+**Note**: This crate requires an internet connection to load Leaflet CSS and JavaScript from CDN. If you need offline support, consider hosting the Leaflet files locally and modifying the component accordingly.
