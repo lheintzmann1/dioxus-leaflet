@@ -19,13 +19,19 @@ A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](h
 - ⚙️ **Configurable map options** for zoom, dragging, and interaction controls
 - 🔄 **Event handling** for map clicks, marker clicks, and map movements
 
+## Screenshots
+
+![Dioxus Leaflet Example 1](images/image1.png)
+
+![Dioxus Leaflet Example 2](images/image2.png)
+
 ## Installation
 
 Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-leaflet = "0.1.1"
+dioxus-leaflet = "0.1.2"
 dioxus = "0.6.3"
 ```
 

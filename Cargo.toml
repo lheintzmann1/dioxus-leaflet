@@ -1,12 +1,13 @@
 [package]
 name = "dioxus-leaflet"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Lucas Heintzmann <lheintzmann1@disroot.org>"]
 license = "MIT OR Apache-2.0"
 description = "A general-purpose Leaflet map component for Dioxus applications"
 homepage = "https://github.com/lheintzmann1/dioxus-leaflet"
 repository = "https://github.com/lheintzmann1/dioxus-leaflet"
 readme = "README.md"
+exclude = ["images/"]
 edition = "2024"
 
 [dependencies]
