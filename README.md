@@ -9,15 +9,14 @@ A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](h
 
 ## Features
 
-- 🗺️ **Easy-to-use map component** with customizable markers
-- 🎯 **Interactive markers** with popups and custom styling
-- 🔧 **Extensible marker system** with custom icons and data
-- ⚡ **TypeScript-like props system** for type-safe configuration
-- 🌐 **CDN-based Leaflet integration** - no additional setup required
-- 📱 **Responsive design** with customizable dimensions
-- 🎨 **Customizable tile layers** including OpenStreetMap and satellite imagery
-- ⚙️ **Configurable map options** for zoom, dragging, and interaction controls
-- 🔄 **Event handling** for map clicks, marker clicks, and map movements
+- **Easy-to-use map component** with customizable markers
+- **Interactive markers** with popups and custom styling
+- **Extensible marker system** with custom icons and data
+- **CDN-based Leaflet integration** - no additional setup required
+- **Responsive design** with customizable dimensions
+- **Customizable tile layers** including OpenStreetMap and satellite imagery
+- **Configurable map options** for zoom, dragging, and interaction controls
+- **Event handling** for map clicks, marker clicks, and map movements
 
 ## Screenshots
 
@@ -31,7 +30,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-leaflet = "0.1.2"
+dioxus-leaflet = "0.1.3"
 dioxus = "0.6.3"
 ```
 
