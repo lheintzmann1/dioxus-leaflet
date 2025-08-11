@@ -24,6 +24,12 @@ A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](h
 
 ![Dioxus Leaflet Example 2](images/image2.png)
 
+### Also works on mobile !
+
+![Dioxus Leaflet Mobile Example 1](images/image3.png)
+
+![Dioxus Leaflet Mobile Example 2](images/image4.png)
+
 ## Installation
 
 Add this to your `Cargo.toml`:
