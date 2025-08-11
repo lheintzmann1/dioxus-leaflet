@@ -36,7 +36,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-leaflet = "0.1.4"
+dioxus-leaflet = "0.1.6"
 dioxus = "0.6.3"
 ```
 

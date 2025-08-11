@@ -45,7 +45,7 @@ pub struct MapProps {
 /// Main map component using Leaflet
 #[component]
 pub fn Map(props: MapProps) -> Element {
-    let map_id: Signal<String> = use_signal(|| generate_map_id());
+    let map_id: Signal<String> = use_signal(generate_map_id);
     let map_id_clone: String = map_id.read().clone();
     
     let init_script: String = generate_map_script(
