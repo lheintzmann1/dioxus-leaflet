@@ -145,29 +145,31 @@ let marker = MapMarker::new(51.505, -0.09, "Custom Marker")
 
 ### Map Options
 
-Customize map behavior with `MapOptions`. Options will use sensible defaults if not specified:
+Customize map behavior with `MapOptions`. All options have sensible defaults:
 
 ```rust
 use dioxus_leaflet::{MapOptions, TileLayer};
 
 // Full configuration with all options specified
 let options = MapOptions {
-    zoom_control: Some(true),
-    scroll_wheel_zoom: Some(true),
-    double_click_zoom: Some(false),
-    touch_zoom: Some(true),
-    dragging: Some(true),
-    keyboard: Some(true),
-    attribution_control: Some(true),
-    tile_layer: Some(TileLayer::satellite()), // Use satellite imagery
+    zoom_control: true,
+    scroll_wheel_zoom: true,
+    double_click_zoom: false,
+    touch_zoom: true,
+    dragging: true,
+    keyboard: true,
+    attribution_control: true,
+    tile_layer: TileLayer::satellite(), // Use satellite imagery
 };
 
-// Minimal configuration - specify only what you want to customize
-let minimal_options = MapOptions {
-    double_click_zoom: Some(false),
-    tile_layer: Some(TileLayer::satellite()),
-    ..MapOptions::new() // All other options will be None (use defaults)
-};
+// Minimal configuration using builder pattern
+let minimal_options = MapOptions::default()
+    .with_double_click_zoom(false)
+    .with_tile_layer(TileLayer::satellite());
+
+// All controls disabled
+let disabled_options = MapOptions::minimal()
+    .with_tile_layer(TileLayer::satellite());
 
 // Use default configuration
 let default_options = MapOptions::default(); // All options set to sensible defaults

@@ -150,84 +150,92 @@ impl Default for PopupOptions {
 /// Map configuration options
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapOptions {
-    pub zoom_control: Option<bool>,
-    pub scroll_wheel_zoom: Option<bool>,
-    pub double_click_zoom: Option<bool>,
-    pub touch_zoom: Option<bool>,
-    pub dragging: Option<bool>,
-    pub keyboard: Option<bool>,
-    pub attribution_control: Option<bool>,
-    pub tile_layer: Option<TileLayer>,
+    pub zoom_control: bool,
+    pub scroll_wheel_zoom: bool,
+    pub double_click_zoom: bool,
+    pub touch_zoom: bool,
+    pub dragging: bool,
+    pub keyboard: bool,
+    pub attribution_control: bool,
+    pub tile_layer: TileLayer,
 }
 
 impl Default for MapOptions {
     fn default() -> Self {
         Self {
-            zoom_control: Some(true),
-            scroll_wheel_zoom: Some(true),
-            double_click_zoom: Some(true),
-            touch_zoom: Some(true),
-            dragging: Some(true),
-            keyboard: Some(true),
-            attribution_control: Some(true),
-            tile_layer: Some(TileLayer::default()),
+            zoom_control: true,
+            scroll_wheel_zoom: true,
+            double_click_zoom: true,
+            touch_zoom: true,
+            dragging: true,
+            keyboard: true,
+            attribution_control: true,
+            tile_layer: TileLayer::default(),
         }
     }
 }
 
 impl MapOptions {
-    /// Creates a new MapOptions with all fields set to None (minimal configuration)
-    pub fn new() -> Self {
+    /// Creates a MapOptions with all controls disabled and default tile layer
+    pub fn minimal() -> Self {
         Self {
-            zoom_control: None,
-            scroll_wheel_zoom: None,
-            double_click_zoom: None,
-            touch_zoom: None,
-            dragging: None,
-            keyboard: None,
-            attribution_control: None,
-            tile_layer: None,
+            zoom_control: false,
+            scroll_wheel_zoom: false,
+            double_click_zoom: false,
+            touch_zoom: false,
+            dragging: false,
+            keyboard: false,
+            attribution_control: false,
+            tile_layer: TileLayer::default(),
         }
     }
 
-    /// Gets the zoom control setting, falling back to default if None
-    pub fn zoom_control(&self) -> bool {
-        self.zoom_control.unwrap_or(true)
+    /// Builder method to enable/disable zoom control
+    pub fn with_zoom_control(mut self, enabled: bool) -> Self {
+        self.zoom_control = enabled;
+        self
     }
 
-    /// Gets the scroll wheel zoom setting, falling back to default if None
-    pub fn scroll_wheel_zoom(&self) -> bool {
-        self.scroll_wheel_zoom.unwrap_or(true)
+    /// Builder method to enable/disable scroll wheel zoom
+    pub fn with_scroll_wheel_zoom(mut self, enabled: bool) -> Self {
+        self.scroll_wheel_zoom = enabled;
+        self
     }
 
-    /// Gets the double click zoom setting, falling back to default if None
-    pub fn double_click_zoom(&self) -> bool {
-        self.double_click_zoom.unwrap_or(true)
+    /// Builder method to enable/disable double click zoom
+    pub fn with_double_click_zoom(mut self, enabled: bool) -> Self {
+        self.double_click_zoom = enabled;
+        self
     }
 
-    /// Gets the touch zoom setting, falling back to default if None
-    pub fn touch_zoom(&self) -> bool {
-        self.touch_zoom.unwrap_or(true)
+    /// Builder method to enable/disable touch zoom
+    pub fn with_touch_zoom(mut self, enabled: bool) -> Self {
+        self.touch_zoom = enabled;
+        self
     }
 
-    /// Gets the dragging setting, falling back to default if None
-    pub fn dragging(&self) -> bool {
-        self.dragging.unwrap_or(true)
+    /// Builder method to enable/disable dragging
+    pub fn with_dragging(mut self, enabled: bool) -> Self {
+        self.dragging = enabled;
+        self
     }
 
-    /// Gets the keyboard setting, falling back to default if None
-    pub fn keyboard(&self) -> bool {
-        self.keyboard.unwrap_or(true)
+    /// Builder method to enable/disable keyboard controls
+    pub fn with_keyboard(mut self, enabled: bool) -> Self {
+        self.keyboard = enabled;
+        self
     }
 
-    /// Gets the attribution control setting, falling back to default if None
-    pub fn attribution_control(&self) -> bool {
-        self.attribution_control.unwrap_or(true)
+    /// Builder method to enable/disable attribution control
+    pub fn with_attribution_control(mut self, enabled: bool) -> Self {
+        self.attribution_control = enabled;
+        self
     }
 
-    /// Gets the tile layer, falling back to default if None
-    pub fn tile_layer(&self) -> TileLayer {
-        self.tile_layer.clone().unwrap_or_default()
+    /// Builder method to set tile layer
+    pub fn with_tile_layer(mut self, tile_layer: TileLayer) -> Self {
+        self.tile_layer = tile_layer;
+        self
     }
 }
 
