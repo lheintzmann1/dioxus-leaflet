@@ -30,7 +30,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-leaflet = "0.1.3"
+dioxus-leaflet = "0.1.4"
 dioxus = "0.6.3"
 ```
 
@@ -145,20 +145,32 @@ let marker = MapMarker::new(51.505, -0.09, "Custom Marker")
 
 ### Map Options
 
-Customize map behavior with `MapOptions`:
+Customize map behavior with `MapOptions`. Options will use sensible defaults if not specified:
 
 ```rust
 use dioxus_leaflet::{MapOptions, TileLayer};
 
+// Full configuration with all options specified
 let options = MapOptions {
-    zoom_control: true,
-    scroll_wheel_zoom: true,
-    double_click_zoom: false,
-    dragging: true,
-    keyboard: true,
-    attribution_control: true,
-    tile_layer: TileLayer::satellite(), // Use satellite imagery
+    zoom_control: Some(true),
+    scroll_wheel_zoom: Some(true),
+    double_click_zoom: Some(false),
+    touch_zoom: Some(true),
+    dragging: Some(true),
+    keyboard: Some(true),
+    attribution_control: Some(true),
+    tile_layer: Some(TileLayer::satellite()), // Use satellite imagery
 };
+
+// Minimal configuration - specify only what you want to customize
+let minimal_options = MapOptions {
+    double_click_zoom: Some(false),
+    tile_layer: Some(TileLayer::satellite()),
+    ..MapOptions::new() // All other options will be None (use defaults)
+};
+
+// Use default configuration
+let default_options = MapOptions::default(); // All options set to sensible defaults
 
 rsx! {
     Map {
@@ -167,6 +179,19 @@ rsx! {
     }
 }
 ```
+
+### Available Map Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `zoom_control` | `Option<bool>` | `true` | Show/hide zoom control buttons |
+| `scroll_wheel_zoom` | `Option<bool>` | `true` | Enable/disable scroll wheel zooming |
+| `double_click_zoom` | `Option<bool>` | `true` | Enable/disable double-click zooming |
+| `touch_zoom` | `Option<bool>` | `true` | Enable/disable touch/pinch zooming |
+| `dragging` | `Option<bool>` | `true` | Enable/disable map dragging |
+| `keyboard` | `Option<bool>` | `true` | Enable/disable keyboard navigation |
+| `attribution_control` | `Option<bool>` | `true` | Show/hide attribution control |
+| `tile_layer` | `Option<TileLayer>` | OpenStreetMap | Tile layer configuration |
 
 ### Tile Layers
 

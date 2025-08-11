@@ -148,35 +148,91 @@ impl Default for PopupOptions {
 }
 
 /// Map configuration options
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapOptions {
-    pub zoom_control: bool,
-    pub scroll_wheel_zoom: bool,
-    pub double_click_zoom: bool,
-    pub touch_zoom: bool,
-    pub dragging: bool,
-    pub keyboard: bool,
-    pub attribution_control: bool,
-    pub tile_layer: TileLayer,
+    pub zoom_control: Option<bool>,
+    pub scroll_wheel_zoom: Option<bool>,
+    pub double_click_zoom: Option<bool>,
+    pub touch_zoom: Option<bool>,
+    pub dragging: Option<bool>,
+    pub keyboard: Option<bool>,
+    pub attribution_control: Option<bool>,
+    pub tile_layer: Option<TileLayer>,
 }
 
 impl Default for MapOptions {
     fn default() -> Self {
         Self {
-            zoom_control: true,
-            scroll_wheel_zoom: true,
-            double_click_zoom: true,
-            touch_zoom: true,
-            dragging: true,
-            keyboard: true,
-            attribution_control: true,
-            tile_layer: TileLayer::default(),
+            zoom_control: Some(true),
+            scroll_wheel_zoom: Some(true),
+            double_click_zoom: Some(true),
+            touch_zoom: Some(true),
+            dragging: Some(true),
+            keyboard: Some(true),
+            attribution_control: Some(true),
+            tile_layer: Some(TileLayer::default()),
         }
     }
 }
 
+impl MapOptions {
+    /// Creates a new MapOptions with all fields set to None (minimal configuration)
+    pub fn new() -> Self {
+        Self {
+            zoom_control: None,
+            scroll_wheel_zoom: None,
+            double_click_zoom: None,
+            touch_zoom: None,
+            dragging: None,
+            keyboard: None,
+            attribution_control: None,
+            tile_layer: None,
+        }
+    }
+
+    /// Gets the zoom control setting, falling back to default if None
+    pub fn zoom_control(&self) -> bool {
+        self.zoom_control.unwrap_or(true)
+    }
+
+    /// Gets the scroll wheel zoom setting, falling back to default if None
+    pub fn scroll_wheel_zoom(&self) -> bool {
+        self.scroll_wheel_zoom.unwrap_or(true)
+    }
+
+    /// Gets the double click zoom setting, falling back to default if None
+    pub fn double_click_zoom(&self) -> bool {
+        self.double_click_zoom.unwrap_or(true)
+    }
+
+    /// Gets the touch zoom setting, falling back to default if None
+    pub fn touch_zoom(&self) -> bool {
+        self.touch_zoom.unwrap_or(true)
+    }
+
+    /// Gets the dragging setting, falling back to default if None
+    pub fn dragging(&self) -> bool {
+        self.dragging.unwrap_or(true)
+    }
+
+    /// Gets the keyboard setting, falling back to default if None
+    pub fn keyboard(&self) -> bool {
+        self.keyboard.unwrap_or(true)
+    }
+
+    /// Gets the attribution control setting, falling back to default if None
+    pub fn attribution_control(&self) -> bool {
+        self.attribution_control.unwrap_or(true)
+    }
+
+    /// Gets the tile layer, falling back to default if None
+    pub fn tile_layer(&self) -> TileLayer {
+        self.tile_layer.clone().unwrap_or_default()
+    }
+}
+
 /// Tile layer configuration
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TileLayer {
     pub url: String,
     pub attribution: String,
