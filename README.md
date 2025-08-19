@@ -12,7 +12,8 @@ A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](h
 - **Easy-to-use map component** with customizable markers
 - **Interactive markers** with popups and custom styling
 - **Extensible marker system** with custom icons and data
-- **CDN-based Leaflet integration** - no additional setup required
+- **Flexible Leaflet integration** - CDN with version selection or local files
+- **Configurable Leaflet resources** with integrity checking for security
 - **Responsive design** with customizable dimensions
 - **Customizable tile layers** including OpenStreetMap and satellite imagery
 - **Configurable map options** for zoom, dragging, and interaction controls
@@ -111,6 +112,55 @@ rsx! {
 | `on_map_click` | `EventHandler<MapPosition>` | None | Callback when map is clicked |
 | `on_map_move` | `EventHandler<MapPosition>` | None | Callback when map is moved |
 
+## Leaflet Resources Configuration
+
+Configure how Leaflet CSS and JavaScript files are loaded. You can use CDN with specific versions or provide local files.
+
+### Using CDN with Default Version (1.9.4)
+
+```rust
+// Default configuration uses Leaflet 1.9.4 from unpkg.com
+let options = MapOptions::default();
+```
+
+### Using CDN with Specific Version
+
+```rust
+use dioxus_leaflet::{MapOptions, LeafletResources};
+
+let options = MapOptions::default()
+    .with_leaflet_resources(LeafletResources::cdn("1.9.3"));
+```
+
+### Using Custom CDN Base URL
+
+```rust
+let options = MapOptions::default()
+    .with_leaflet_resources(
+        LeafletResources::cdn_with_base_url("1.9.4", "https://cdn.jsdelivr.net/npm")
+    );
+```
+
+### Using Local Files
+
+```rust
+let options = MapOptions::default()
+    .with_leaflet_resources(LeafletResources::local(
+        "/static/css/leaflet.css",
+        "/static/js/leaflet.js"
+    ));
+```
+
+### Leaflet Resource Options
+
+| Method | Description | Security |
+|--------|-------------|----------|
+| `LeafletResources::cdn(version)` | Uses unpkg.com CDN with specified version | Includes integrity checking for known versions |
+| `LeafletResources::cdn_with_base_url(version, base_url)` | Uses custom CDN base URL | No integrity checking for custom URLs |
+| `LeafletResources::local(css_path, js_path)` | Uses local files from specified paths | No integrity checking |
+
+**Note**: Integrity checking is automatically applied for known Leaflet versions (1.9.2, 1.9.3, 1.9.4) when using the default unpkg.com CDN.
+
 ## Working with Markers
 
 ### Basic Markers
@@ -192,14 +242,15 @@ rsx! {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `zoom_control` | `Option<bool>` | `true` | Show/hide zoom control buttons |
-| `scroll_wheel_zoom` | `Option<bool>` | `true` | Enable/disable scroll wheel zooming |
-| `double_click_zoom` | `Option<bool>` | `true` | Enable/disable double-click zooming |
-| `touch_zoom` | `Option<bool>` | `true` | Enable/disable touch/pinch zooming |
-| `dragging` | `Option<bool>` | `true` | Enable/disable map dragging |
-| `keyboard` | `Option<bool>` | `true` | Enable/disable keyboard navigation |
-| `attribution_control` | `Option<bool>` | `true` | Show/hide attribution control |
-| `tile_layer` | `Option<TileLayer>` | OpenStreetMap | Tile layer configuration |
+| `zoom_control` | `bool` | `true` | Show/hide zoom control buttons |
+| `scroll_wheel_zoom` | `bool` | `true` | Enable/disable scroll wheel zooming |
+| `double_click_zoom` | `bool` | `true` | Enable/disable double-click zooming |
+| `touch_zoom` | `bool` | `true` | Enable/disable touch/pinch zooming |
+| `dragging` | `bool` | `true` | Enable/disable map dragging |
+| `keyboard` | `bool` | `true` | Enable/disable keyboard navigation |
+| `attribution_control` | `bool` | `true` | Show/hide attribution control |
+| `tile_layer` | `TileLayer` | OpenStreetMap | Tile layer configuration |
+| `leaflet_resources` | `LeafletResources` | CDN v1.9.4 | Leaflet CSS/JS resource configuration |
 
 ### Tile Layers
 
@@ -282,6 +333,64 @@ The component uses these CSS classes that you can style:
 ```
 
 ## Examples
+
+### Basic Map with Custom Leaflet Version
+
+```rust
+use dioxus::prelude::*;
+use dioxus_leaflet::{Map, MapPosition, MapMarker, MapOptions, LeafletResources};
+
+fn App() -> Element {
+    let markers = vec![
+        MapMarker::new(51.505, -0.09, "London")
+            .with_description("Capital of England"),
+    ];
+
+    let options = MapOptions::default()
+        .with_leaflet_resources(LeafletResources::cdn("1.9.3"))
+        .with_zoom_control(true);
+
+    rsx! {
+        Map {
+            initial_position: MapPosition::new(51.505, -0.09, 13.0),
+            markers: markers,
+            options: options,
+            height: "400px",
+            width: "100%"
+        }
+    }
+}
+```
+
+### Map with Local Leaflet Files
+
+```rust
+use dioxus::prelude::*;
+use dioxus_leaflet::{Map, MapPosition, MapMarker, MapOptions, LeafletResources};
+
+fn OfflineMap() -> Element {
+    let markers = vec![
+        MapMarker::new(48.8566, 2.3522, "Paris")
+            .with_description("Capital of France"),
+    ];
+
+    let options = MapOptions::default()
+        .with_leaflet_resources(LeafletResources::local(
+            "/assets/leaflet/leaflet.css",
+            "/assets/leaflet/leaflet.js"
+        ));
+
+    rsx! {
+        Map {
+            initial_position: MapPosition::new(48.8566, 2.3522, 12.0),
+            markers: markers,
+            options: options,
+            height: "500px",
+            width: "100%"
+        }
+    }
+}
+```
 
 ### Tourist Map
 
@@ -375,4 +484,37 @@ at your option.
 
 ---
 
-**Note**: This crate requires an internet connection to load Leaflet CSS and JavaScript from CDN. If you need offline support, consider hosting the Leaflet files locally and modifying the component accordingly.
+**Note**:
+
+### Internet Connection Requirements
+
+- **CDN mode**: Requires internet connection to load Leaflet from CDN (default behavior)
+- **Local mode**: Works offline when using local Leaflet files
+
+### Setting Up Local Files
+
+To use local Leaflet files:
+
+1. Download Leaflet from [leafletjs.com](https://leafletjs.com/download.html)
+2. Place the CSS and JS files in your static assets directory
+3. Configure the paths using `LeafletResources::local()`
+
+Example directory structure:
+
+```text
+static/
+├── css/
+│   └── leaflet.css
+├── js/
+│   └── leaflet.js
+```
+
+Usage:
+
+```rust
+let options = MapOptions::default()
+    .with_leaflet_resources(LeafletResources::local(
+        "/static/css/leaflet.css",
+        "/static/js/leaflet.js"
+    ));
+```

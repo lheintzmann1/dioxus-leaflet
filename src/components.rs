@@ -72,11 +72,18 @@ pub fn Map(props: MapProps) -> Element {
             style: "{container_style}",
             
             // Leaflet CSS
-            link {
-                rel: "stylesheet",
-                href: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-                integrity: "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=",
-                crossorigin: ""
+            if let Some(integrity) = props.options.leaflet_resources.css_integrity() {
+                link {
+                    rel: "stylesheet",
+                    href: "{props.options.leaflet_resources.css_url()}",
+                    integrity: "{integrity}",
+                    crossorigin: ""
+                }
+            } else {
+                link {
+                    rel: "stylesheet",
+                    href: "{props.options.leaflet_resources.css_url()}"
+                }
             }
             
             // Map container
@@ -87,10 +94,16 @@ pub fn Map(props: MapProps) -> Element {
             }
             
             // Leaflet JavaScript
-            script {
-                src: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-                integrity: "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=",
-                crossorigin: ""
+            if let Some(integrity) = props.options.leaflet_resources.js_integrity() {
+                script {
+                    src: "{props.options.leaflet_resources.js_url()}",
+                    integrity: "{integrity}",
+                    crossorigin: ""
+                }
+            } else {
+                script {
+                    src: "{props.options.leaflet_resources.js_url()}"
+                }
             }
             
             // Initialize map script
