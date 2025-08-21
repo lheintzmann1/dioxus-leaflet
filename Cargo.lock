@@ -560,7 +560,7 @@ dependencies = [
 
 [[package]]
 name = "dioxus-leaflet"
-version = "0.1.7"
+version = "0.1.8-rc.0"
 dependencies = [
  "dioxus",
  "fastrand",
