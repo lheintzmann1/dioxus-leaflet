@@ -83,9 +83,9 @@
 
 pub mod components;
 pub mod types;
-pub mod utils;
+pub mod interop;
 
 // Re-export main types and components
 pub use components::*;
 pub use types::*;
-pub use utils::*;
+pub use interop::*;

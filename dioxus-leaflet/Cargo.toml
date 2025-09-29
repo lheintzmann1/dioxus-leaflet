@@ -1,0 +1,20 @@
+[package]
+name = "dioxus-leaflet"
+version = "0.1.8-rc.1"
+authors = ["Lucas Heintzmann <lheintzmann1@disroot.org>"]
+license = "MIT OR Apache-2.0"
+description = "A general-purpose Leaflet map component for Dioxus applications"
+homepage = "https://github.com/lheintzmann1/dioxus-leaflet"
+repository = "https://github.com/lheintzmann1/dioxus-leaflet"
+readme = "README.md"
+edition = "2024"
+
+[dependencies]
+dioxus = { workspace = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+fastrand = "2.0"
+dioxus-logger = "0.7.0-rc.0"
+
+[features]
+default = []

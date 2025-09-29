@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 use crate::types::*;
-use crate::utils::*;
+use crate::interop::{DL_JS, generate_map_id, initialize};
 
 #[derive(Props, Clone, PartialEq)]
 pub struct MapProps {
@@ -46,14 +46,7 @@ pub struct MapProps {
 #[component]
 pub fn Map(props: MapProps) -> Element {
     let map_id: Signal<String> = use_signal(generate_map_id);
-    let map_id_clone: String = map_id.read().clone();
-    
-    let init_script: String = generate_map_script(
-        &map_id_clone,
-        &props.initial_position,
-        &props.markers,
-        &props.options,
-    );
+    let mut load_error: Signal<Option<String>> = use_signal(|| None);
     
     let container_style = format!(
         "position: relative; width: {}; height: {}; {}",
@@ -65,50 +58,59 @@ pub fn Map(props: MapProps) -> Element {
     } else {
         format!("dioxus-leaflet-container {}", props.class)
     };
-    
+
+    let css_path = if let Some(_) = props.options.leaflet_resources.css_integrity() {
+        props.options.leaflet_resources.css_url()
+    } else {
+        props.options.leaflet_resources.css_url()
+    };
+
+    let js_path = if let Some(_) = props.options.leaflet_resources.js_integrity() {
+        props.options.leaflet_resources.js_url()
+    } else {
+        props.options.leaflet_resources.js_url()
+    };
+
+    let onmounted = move |_| {
+        let id = (&*map_id.read()).clone();
+        let pos = props.initial_position.clone();
+        let markers = props.markers.clone();
+        let opts = props.options.clone();
+
+        async move {
+            if let Err(e) = initialize(&id, &pos, &markers, &opts).await {
+                load_error.set(Some(e));
+            }
+        }
+    };
+
     rsx! {
-        div {
-            class: "{container_class}",
-            style: "{container_style}",
-            
-            // Leaflet CSS
-            if let Some(integrity) = props.options.leaflet_resources.css_integrity() {
-                link {
-                    rel: "stylesheet",
-                    href: "{props.options.leaflet_resources.css_url()}",
-                    integrity: "{integrity}",
-                    crossorigin: ""
-                }
-            } else {
-                link {
-                    rel: "stylesheet",
-                    href: "{props.options.leaflet_resources.css_url()}"
-                }
+        // Leaflet CSS
+        document::Style { href: css_path }
+        
+        // Leaflet JavaScript
+        document::Script { src: js_path }
+        
+        // boot logic
+        document::Script { src: DL_JS }
+
+        if let Some(err) = &*load_error.read() {
+            p {
+                "{err}"
             }
-            
-            // Map container
+        }
+        else {
             div {
-                id: "{map_id_clone}",
-                class: "dioxus-leaflet-map",
-                style: "width: 100%; height: 100%; z-index: 1;",
-            }
-            
-            // Leaflet JavaScript
-            if let Some(integrity) = props.options.leaflet_resources.js_integrity() {
-                script {
-                    src: "{props.options.leaflet_resources.js_url()}",
-                    integrity: "{integrity}",
-                    crossorigin: ""
+                class: "{container_class}",
+                style: "{container_style}",
+
+                // Map container
+                div {
+                    id: "{map_id}",
+                    class: "dioxus-leaflet-map",
+                    style: "width: 100%; height: 100%; z-index: 1;",
+                    onmounted: onmounted,
                 }
-            } else {
-                script {
-                    src: "{props.options.leaflet_resources.js_url()}"
-                }
-            }
-            
-            // Initialize map script
-            script {
-                dangerous_inner_html: "{init_script}"
             }
         }
     }
