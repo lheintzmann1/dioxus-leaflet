@@ -1,11 +1,13 @@
 window.DioxusLeaflet = class DioxusLeaflet {
     static _maps = {};
+    static _markers = {};
 
-    static async initializeAsync(recv, send) {
+    static async updateAsync(recv, send) {
         let options = await recv();
         let error = null;
         try {
-            this._maps[options.map_id] = this.initialize(options);
+            this.initialize(options);
+            this.updateMarkers(options);
         }
         catch (e) {
             console.error("Error initializing dioxus leaflet map:", e);
@@ -16,9 +18,13 @@ window.DioxusLeaflet = class DioxusLeaflet {
         }
     }
 
-    static initialize({ map_id, initial_position, markers, options }) {
+    static initialize({ map_id, initial_position, options }) {
+        if (this._maps[map_id]) {
+            return this._maps[map_id];
+        }
+
         // Initialize the map with options
-        var map = L.map(map_id, {
+        const map = this._maps[map_id] = L.map(map_id, {
             zoomControl: options.zoom_control,
             scrollWheelZoom: options.scroll_wheel_zoom,
             doubleClickZoom: options.double_click_zoom,
@@ -35,36 +41,26 @@ window.DioxusLeaflet = class DioxusLeaflet {
             subdomains: options.tile_layer.subdomains
         }).addTo(map);
 
+        // Force resize to ensure proper display
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 100);
+    }
+
+    static updateMarkers({ map_id, markers: data }) {
+        const map = this._maps[map_id];
+        const markers = this._markers[map_id] ??= [];
+
         // Add markers
-        for (let markerData of markers) {
-            var markerOptions = {};
-            
+        for (let i = 0; i < data.length; i++) {
+            const markerData = data[i];
+            let marker = markers[i] ??= L.marker([0, 0]).addTo(map);
+            marker.setLatLng([markerData.lat, markerData.lng]);
+
             // Custom icon if provided
             if (markerData.icon) {
-                var iconOptions = {
-                    iconUrl: markerData.icon.icon_url
-                };
-                
-                if (markerData.icon.icon_size) {
-                    iconOptions.iconSize = markerData.icon.icon_size;
-                }
-                if (markerData.icon.icon_anchor) {
-                    iconOptions.iconAnchor = markerData.icon.icon_anchor;
-                }
-                if (markerData.icon.popup_anchor) {
-                    iconOptions.popupAnchor = markerData.icon.popup_anchor;
-                }
-                if (markerData.icon.shadow_url) {
-                    iconOptions.shadowUrl = markerData.icon.shadow_url;
-                }
-                if (markerData.icon.shadow_size) {
-                    iconOptions.shadowSize = markerData.icon.shadow_size;
-                }
-                
-                markerOptions.icon = L.icon(iconOptions);
+                marker.setIcon(L.icon(markerData.icon));
             }
-            
-            var marker = L.marker([markerData.lat, markerData.lng], markerOptions).addTo(map);
             
             // Add popup if title or description exists
             if (markerData.title || markerData.description) {
@@ -82,15 +78,14 @@ window.DioxusLeaflet = class DioxusLeaflet {
                     Object.assign(popupOptions, markerData.popup_options);
                 }
                 
+                marker.unbindPopup();
                 marker.bindPopup(popupContent, popupOptions);
             }
         }
-        
-        // Force resize to ensure proper display
-        setTimeout(function() {
-            map.invalidateSize();
-        }, 100);
-        
-        return map;
+
+        for (let i = data.length; i < markers.length; i++) {
+            markers[i].remove();
+        }
+        markers.length = data.length;
     }
 }

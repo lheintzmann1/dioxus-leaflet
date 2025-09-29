@@ -1,6 +1,11 @@
 use dioxus::prelude::*;
 use crate::types::*;
-use crate::interop::{DL_JS, generate_map_id, initialize};
+use crate::interop::{DL_JS, update};
+
+/// Generates a unique map ID
+pub fn generate_map_id() -> String {
+    format!("dioxus_leaflet_map_{}", fastrand::u32(..))
+}
 
 #[derive(Props, Clone, PartialEq)]
 pub struct MapProps {
@@ -10,7 +15,7 @@ pub struct MapProps {
     
     /// Markers to display on the map
     #[props(default = vec![])]
-    pub markers: Vec<MapMarker>,
+    pub markers: ReadOnlySignal<Vec<MapMarker>>,
     
     /// Height of the map container
     #[props(default = "500px".to_string())]
@@ -78,7 +83,7 @@ pub fn Map(props: MapProps) -> Element {
         let opts = props.options.clone();
 
         async move {
-            if let Err(e) = initialize(&id, &pos, &markers, &opts).await {
+            if let Err(e) = update(&id, &pos, &*markers.read(), &opts).await {
                 load_error.set(Some(e));
             }
         }
