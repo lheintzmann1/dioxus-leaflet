@@ -1,16 +1,36 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-
-use super::{MarkerIcon, PopupOptions};
+use crate::{MarkerIcon, PathOptions, PopupOptions};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum MarkerType {
     Pin,
-    Circle { radius_px: u32 },
+    Circle(CircleMarkerOptions),
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CircleMarkerOptions {
+    /// Radius of the circle marker, in pixels
+    pub radius: u32,
+
+    #[serde(flatten)]
+    pub path_options: PathOptions,
+}
+
+impl Default for CircleMarkerOptions {
+    fn default() -> Self {
+        Self {
+            radius: 10,
+            path_options: PathOptions {
+                fill: true,
+                ..Default::default()
+            },
+        }
+    }
 }
 
 /// Represents a marker on the map
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct MapMarker {
     pub r#type: MarkerType,
     pub lat: f64,
@@ -26,16 +46,6 @@ impl MapMarker {
     /// Creates a new MapMarker with basic information
     pub fn new(lat: f64, lng: f64, title: impl Into<String>) -> Self {
         Self {
-            lat,
-            lng,
-            title: title.into(),
-            ..Default::default()
-        }
-    }
-
-    pub fn new_circle(radius_px: u32, lat: f64, lng: f64, title: impl Into<String>) -> Self {
-        Self {
-            r#type: MarkerType::Circle { radius_px },
             lat,
             lng,
             title: title.into(),
@@ -69,6 +79,11 @@ impl MapMarker {
         if let Some(ref mut data) = self.custom_data {
             data.insert(key.into(), value.into());
         }
+        self
+    }
+
+    pub fn with_circle_options(mut self, options: CircleMarkerOptions) -> Self {
+        self.r#type = MarkerType::Circle(options);
         self
     }
 }

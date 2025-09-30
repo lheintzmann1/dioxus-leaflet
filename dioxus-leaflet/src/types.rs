@@ -2,7 +2,7 @@ mod map_position;
 pub use map_position::MapPosition;
 
 mod map_marker;
-pub use map_marker::{MapMarker, MarkerType};
+pub use map_marker::{MapMarker, MarkerType, CircleMarkerOptions};
 
 mod marker_icon;
 pub use marker_icon::MarkerIcon;
@@ -18,3 +18,9 @@ pub use tile_layer::TileLayer;
 
 mod leaflet_resources;
 pub use leaflet_resources::LeafletResources;
+
+mod path_options;
+pub use path_options::{Color, LineCap, LineJoin, PathOptions};
+
+mod polygon;
+pub use polygon::Polygon;

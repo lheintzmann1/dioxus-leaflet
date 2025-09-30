@@ -1,6 +1,7 @@
 window.DioxusLeaflet = class DioxusLeaflet {
     static _maps = {};
     static _markers = {};
+    static _polygons = {};
 
     static async updateAsync(recv, send) {
         let options = await recv();
@@ -8,9 +9,10 @@ window.DioxusLeaflet = class DioxusLeaflet {
         try {
             this.initialize(options);
             this.updateMarkers(options);
+            this.updatePolygons(options);
         }
         catch (e) {
-            console.error("Error initializing dioxus leaflet map:", e);
+            console.error("Error updating dioxus leaflet map:", e);
             error = e.toString();
         }
         finally {
@@ -60,13 +62,14 @@ window.DioxusLeaflet = class DioxusLeaflet {
                 if (marker) {
                     marker.remove();
                 }
-                marker = L.circleMarker([0, 0], { radius: markerData.type.Circle.radius_px });
-            } else if (!marker || !(marker instanceof L.Marker)) {
+                marker = L.circleMarker([0, 0], markerData.type.Circle);
+            } else if (markerData.type === "Pin" && (!marker || !(marker instanceof L.Marker))) {
                 if (marker) {
                     marker.remove();
                 }
                 marker = L.marker([0, 0]);
             }
+
             marker.addTo(map);
             markers[i] = marker;
             marker.setLatLng([markerData.lat, markerData.lng]);
@@ -97,9 +100,48 @@ window.DioxusLeaflet = class DioxusLeaflet {
             }
         }
 
+        // remove markers
         for (let i = data.length; i < markers.length; i++) {
             markers[i].remove();
         }
         markers.length = data.length;
+    }
+
+    static updatePolygons({ map_id, polygons: data }) {
+        const map = this._maps[map_id];
+        const gons = this._polygons[map_id] ??= [];
+
+        // add polygons
+        for (let i = 0; i < data.length; i++) {
+            let gonData = data[i];
+
+            let gon = gons[i] ??= L.polygon(gonData.points, gonData.path_options).addTo(map);
+
+            // Add popup if title or description exists
+            if (gonData.title || gonData.description) {
+                var popupContent = '';
+                if (gonData.title) {
+                    popupContent += '<b>' + gonData.title + '</b>';
+                }
+                if (gonData.description) {
+                    if (gonData.title) popupContent += '<br>';
+                    popupContent += gonData.description;
+                }
+                
+                var popupOptions = {};
+                if (gonData.popup_options) {
+                    Object.assign(popupOptions, gonData.popup_options);
+                }
+                
+                gon.unbindPopup();
+                gon.bindPopup(popupContent, popupOptions);
+            }
+        }
+
+        // remove polygons
+        for (let i = data.length; i < gons.length; i++) {
+            gons[i].remove();
+        }
+        gons.length = data.length;
     }
 }

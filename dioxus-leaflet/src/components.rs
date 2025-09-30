@@ -16,6 +16,10 @@ pub struct MapProps {
     /// Markers to display on the map
     #[props(default = vec![])]
     pub markers: ReadOnlySignal<Vec<MapMarker>>,
+
+    /// Polygons to display on the map
+    #[props(default = vec![])]
+    pub polygons: ReadOnlySignal<Vec<Polygon>>,
     
     /// Height of the map container
     #[props(default = "500px".to_string())]
@@ -80,9 +84,10 @@ pub fn Map(props: MapProps) -> Element {
         let id = map_id();
         let pos = props.initial_position.clone();
         let markers = (props.markers)();
+        let gons = (props.polygons)();
         let opts = props.options.clone();
         spawn(async move {
-            if let Err(e) = interop::update(&id, &pos, &markers, &opts).await {
+            if let Err(e) = interop::update(&id, &pos, &markers, &gons, &opts).await {
                 load_error.set(Some(e));
             }
         });

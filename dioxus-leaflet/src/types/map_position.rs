@@ -10,7 +10,7 @@ pub struct MapPosition {
 
 impl MapPosition {
     /// Creates a new MapPosition
-    pub fn new(lat: f64, lng: f64, zoom: f64) -> Self {
+    pub const fn new(lat: f64, lng: f64, zoom: f64) -> Self {
         Self { lat, lng, zoom }
     }
 }
