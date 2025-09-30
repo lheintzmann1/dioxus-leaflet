@@ -3,12 +3,12 @@ use serde::Serialize;
 
 use crate::{MapMarker, MapOptions, MapPosition};
 
-pub const DL_JS: Asset = asset!("/assets/initialize_dioxus_leaflet_map.js");
+pub const DL_JS: Asset = asset!("/assets/dioxus_leaflet.js");
 const CALL_INIT_JS: &str = r#"
 while (!window.L || !window.DioxusLeaflet) {
-    await new Promise(cb => setTimeout(cb, 300));
+    await new Promise(cb => setTimeout(cb, 100));
 }
-window.DioxusLeaflet.updateAsync(() => dioxus.recv(), (x) => dioxus.send(x));
+await window.DioxusLeaflet.updateAsync(() => dioxus.recv(), (x) => dioxus.send(x));
 "#;
 
 #[derive(Serialize)]

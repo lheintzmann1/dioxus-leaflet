@@ -20,7 +20,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
 
     static initialize({ map_id, initial_position, options }) {
         if (this._maps[map_id]) {
-            return this._maps[map_id];
+            return;
         }
 
         // Initialize the map with options
