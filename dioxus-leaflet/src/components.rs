@@ -1,6 +1,11 @@
 use dioxus::prelude::*;
 use crate::types::*;
-use crate::interop::{DL_JS, generate_map_id, initialize};
+use crate::interop;
+
+/// Generates a unique map ID
+pub fn generate_map_id() -> String {
+    format!("dioxus_leaflet_map_{}", fastrand::u32(..))
+}
 
 #[derive(Props, Clone, PartialEq)]
 pub struct MapProps {
@@ -10,7 +15,7 @@ pub struct MapProps {
     
     /// Markers to display on the map
     #[props(default = vec![])]
-    pub markers: Vec<MapMarker>,
+    pub markers: ReadOnlySignal<Vec<MapMarker>>,
     
     /// Height of the map container
     #[props(default = "500px".to_string())]
@@ -71,18 +76,17 @@ pub fn Map(props: MapProps) -> Element {
         props.options.leaflet_resources.js_url()
     };
 
-    let onmounted = move |_| {
-        let id = (&*map_id.read()).clone();
+    use_effect(move || {
+        let id = map_id();
         let pos = props.initial_position.clone();
-        let markers = props.markers.clone();
+        let markers = (props.markers)();
         let opts = props.options.clone();
-
-        async move {
-            if let Err(e) = initialize(&id, &pos, &markers, &opts).await {
+        spawn(async move {
+            if let Err(e) = interop::update(&id, &pos, &markers, &opts).await {
                 load_error.set(Some(e));
             }
-        }
-    };
+        });
+    });
 
     rsx! {
         // Leaflet CSS
@@ -92,7 +96,7 @@ pub fn Map(props: MapProps) -> Element {
         document::Script { src: js_path }
         
         // boot logic
-        document::Script { src: DL_JS }
+        document::Script { src: interop::DL_JS }
 
         if let Some(err) = &*load_error.read() {
             p {
@@ -109,7 +113,6 @@ pub fn Map(props: MapProps) -> Element {
                     id: "{map_id}",
                     class: "dioxus-leaflet-map",
                     style: "width: 100%; height: 100%; z-index: 1;",
-                    onmounted: onmounted,
                 }
             }
         }
