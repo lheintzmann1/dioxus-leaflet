@@ -54,7 +54,21 @@ window.DioxusLeaflet = class DioxusLeaflet {
         // Add markers
         for (let i = 0; i < data.length; i++) {
             const markerData = data[i];
-            let marker = markers[i] ??= L.marker([0, 0]).addTo(map);
+
+            let marker = markers[i];
+            if (markerData.type?.Circle && (!marker || !(marker instanceof L.CircleMarker))) {
+                if (marker) {
+                    marker.remove();
+                }
+                marker = L.circleMarker([0, 0], { radius: markerData.type.Circle.radius_px });
+            } else if (!marker || !(marker instanceof L.Marker)) {
+                if (marker) {
+                    marker.remove();
+                }
+                marker = L.marker([0, 0]);
+            }
+            marker.addTo(map);
+            markers[i] = marker;
             marker.setLatLng([markerData.lat, markerData.lng]);
 
             // Custom icon if provided

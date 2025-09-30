@@ -3,9 +3,16 @@ use serde::{Deserialize, Serialize};
 
 use super::{MarkerIcon, PopupOptions};
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum MarkerType {
+    Pin,
+    Circle { radius_px: u32 },
+}
+
 /// Represents a marker on the map
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapMarker {
+    pub r#type: MarkerType,
     pub lat: f64,
     pub lng: f64,
     pub title: String,
@@ -22,10 +29,17 @@ impl MapMarker {
             lat,
             lng,
             title: title.into(),
-            description: None,
-            icon: None,
-            popup_options: None,
-            custom_data: None,
+            ..Default::default()
+        }
+    }
+
+    pub fn new_circle(radius_px: u32, lat: f64, lng: f64, title: impl Into<String>) -> Self {
+        Self {
+            r#type: MarkerType::Circle { radius_px },
+            lat,
+            lng,
+            title: title.into(),
+            ..Default::default()
         }
     }
 
@@ -62,6 +76,7 @@ impl MapMarker {
 impl Default for MapMarker {
     fn default() -> Self {
         Self {
+            r#type: MarkerType::Pin,
             lat: 0.0,
             lng: 0.0,
             title: String::new(),

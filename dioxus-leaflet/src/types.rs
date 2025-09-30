@@ -2,7 +2,7 @@ mod map_position;
 pub use map_position::MapPosition;
 
 mod map_marker;
-pub use map_marker::MapMarker;
+pub use map_marker::{MapMarker, MarkerType};
 
 mod marker_icon;
 pub use marker_icon::MarkerIcon;

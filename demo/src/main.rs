@@ -1,12 +1,12 @@
 use dioxus::prelude::*;
-use dioxus_leaflet::{Map, MapPosition, MapMarker};
+use dioxus_leaflet::{Map, MapPosition, MapMarker, MarkerType};
 
 #[component]
 fn App() -> Element {
     let mut markers = use_signal(|| vec![
         MapMarker::new(51.505, -0.09, "London")
             .with_description("Capital of England"),
-        MapMarker::new(48.8566, 2.3522, "Paris")
+        MapMarker::new_circle(5, 48.8566, 2.3522, "Paris")
             .with_description("Capital of France"),
     ]);
 
@@ -23,7 +23,7 @@ fn App() -> Element {
                     markers.remove(markers.len() - 1);
                 }
             },
-            "Remove One"
+            "Remove Marker"
         }
         button {
             onclick: move |_| {
@@ -34,7 +34,18 @@ fn App() -> Element {
                     markers.push(new_marker);
                 }
             },
-            "Add One"
+            "Add Marker"
+        }
+        button {
+            onclick: move |_| {
+                for mut m in markers.iter_mut() {
+                    m.r#type = match m.r#type {
+                        MarkerType::Pin => MarkerType::Circle { radius_px: 5 },
+                        MarkerType::Circle { .. } => MarkerType::Pin,
+                    };
+                }
+            },
+            "Switch Types"
         }
     }
 }
