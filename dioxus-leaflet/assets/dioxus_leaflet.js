@@ -1,6 +1,7 @@
 window.DioxusLeaflet = class DioxusLeaflet {
     static _maps = {};
     static _markers = {};
+    static _polygons = {};
 
     static async updateAsync(recv, send) {
         let options = await recv();
@@ -8,9 +9,10 @@ window.DioxusLeaflet = class DioxusLeaflet {
         try {
             this.initialize(options);
             this.updateMarkers(options);
+            this.updatePolygons(options);
         }
         catch (e) {
-            console.error("Error initializing dioxus leaflet map:", e);
+            console.error("Error updating dioxus leaflet map:", e);
             error = e.toString();
         }
         finally {
@@ -20,7 +22,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
 
     static initialize({ map_id, initial_position, options }) {
         if (this._maps[map_id]) {
-            return this._maps[map_id];
+            return;
         }
 
         // Initialize the map with options
@@ -32,7 +34,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
             dragging: options.dragging,
             keyboard: options.keyboard,
             attributionControl: options.attribution_control
-        }).setView([initial_position.lat, initial_position.lng], initial_position.zoom);
+        }).setView(initial_position.coordinates, initial_position.zoom);
 
         // Add tile layer
         L.tileLayer(options.tile_layer.url, {
@@ -54,8 +56,23 @@ window.DioxusLeaflet = class DioxusLeaflet {
         // Add markers
         for (let i = 0; i < data.length; i++) {
             const markerData = data[i];
-            let marker = markers[i] ??= L.marker([0, 0]).addTo(map);
-            marker.setLatLng([markerData.lat, markerData.lng]);
+
+            let marker = markers[i];
+            if (markerData.type?.Circle && (!marker || !(marker instanceof L.CircleMarker))) {
+                if (marker) {
+                    marker.remove();
+                }
+                marker = L.circleMarker([0, 0], markerData.type.Circle);
+            } else if (markerData.type === "Pin" && (!marker || !(marker instanceof L.Marker))) {
+                if (marker) {
+                    marker.remove();
+                }
+                marker = L.marker([0, 0]);
+            }
+
+            marker.addTo(map);
+            markers[i] = marker;
+            marker.setLatLng(markerData.coordinates);
 
             // Custom icon if provided
             if (markerData.icon) {
@@ -83,9 +100,48 @@ window.DioxusLeaflet = class DioxusLeaflet {
             }
         }
 
+        // remove markers
         for (let i = data.length; i < markers.length; i++) {
             markers[i].remove();
         }
         markers.length = data.length;
+    }
+
+    static updatePolygons({ map_id, polygons: data }) {
+        const map = this._maps[map_id];
+        const gons = this._polygons[map_id] ??= [];
+
+        // add polygons
+        for (let i = 0; i < data.length; i++) {
+            let gonData = data[i];
+
+            let gon = gons[i] ??= L.polygon(gonData.coordinates, gonData.path_options).addTo(map);
+
+            // Add popup if title or description exists
+            if (gonData.title || gonData.description) {
+                var popupContent = '';
+                if (gonData.title) {
+                    popupContent += '<b>' + gonData.title + '</b>';
+                }
+                if (gonData.description) {
+                    if (gonData.title) popupContent += '<br>';
+                    popupContent += gonData.description;
+                }
+                
+                var popupOptions = {};
+                if (gonData.popup_options) {
+                    Object.assign(popupOptions, gonData.popup_options);
+                }
+                
+                gon.unbindPopup();
+                gon.bindPopup(popupContent, popupOptions);
+            }
+        }
+
+        // remove polygons
+        for (let i = data.length; i < gons.length; i++) {
+            gons[i].remove();
+        }
+        gons.length = data.length;
     }
 }

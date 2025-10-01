@@ -1,7 +1,10 @@
 [package]
 name = "dioxus-leaflet"
-version = "0.1.8-rc.2"
-authors = ["Lucas Heintzmann <lheintzmann1@disroot.org>"]
+version = "0.2.0"
+authors = [
+    "Lucas Heintzmann <lheintzmann1@disroot.org>", 
+    "Steven Vergenz <1882376+stevenvergenz@users.noreply.github.com>",
+]
 license = "MIT OR Apache-2.0"
 description = "A general-purpose Leaflet map component for Dioxus applications"
 homepage = "https://github.com/lheintzmann1/dioxus-leaflet"
@@ -15,6 +18,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 fastrand = "2.0"
 dioxus-logger = "0.7.0-rc.0"
+color = { version = "0.3.2", features = ["serde"] }
 
 [features]
 default = []
