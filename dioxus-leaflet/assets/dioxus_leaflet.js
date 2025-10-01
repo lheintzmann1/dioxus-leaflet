@@ -34,7 +34,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
             dragging: options.dragging,
             keyboard: options.keyboard,
             attributionControl: options.attribution_control
-        }).setView([initial_position.lat, initial_position.lng], initial_position.zoom);
+        }).setView(initial_position.coordinates, initial_position.zoom);
 
         // Add tile layer
         L.tileLayer(options.tile_layer.url, {
@@ -72,7 +72,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
 
             marker.addTo(map);
             markers[i] = marker;
-            marker.setLatLng([markerData.lat, markerData.lng]);
+            marker.setLatLng(markerData.coordinates);
 
             // Custom icon if provided
             if (markerData.icon) {
@@ -115,7 +115,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
         for (let i = 0; i < data.length; i++) {
             let gonData = data[i];
 
-            let gon = gons[i] ??= L.polygon(gonData.points, gonData.path_options).addTo(map);
+            let gon = gons[i] ??= L.polygon(gonData.coordinates, gonData.path_options).addTo(map);
 
             // Add popup if title or description exists
             if (gonData.title || gonData.description) {

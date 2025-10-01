@@ -1,9 +1,9 @@
 use serde::Serialize;
-use crate::{MapPosition, PathOptions, PopupOptions};
+use crate::{LatLng, PathOptions, PopupOptions};
 
 #[derive(Debug, Default, Clone, PartialEq, Serialize)]
 pub struct Polygon {
-    pub points: Vec<MapPosition>,
+    pub coordinates: Vec<LatLng>,
     pub path_options: Option<PathOptions>,
     pub title: String,
     pub description: Option<String>,

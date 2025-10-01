@@ -1,17 +1,17 @@
 use serde::{Deserialize, Serialize};
+use crate::LatLng;
 
 /// Represents a geographical position with zoom level
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapPosition {
-    pub lat: f64,
-    pub lng: f64,
+    pub coordinates: LatLng,
     pub zoom: f64,
 }
 
 impl MapPosition {
     /// Creates a new MapPosition
     pub const fn new(lat: f64, lng: f64, zoom: f64) -> Self {
-        Self { lat, lng, zoom }
+        Self { coordinates: LatLng::new(lat, lng), zoom }
     }
 }
 

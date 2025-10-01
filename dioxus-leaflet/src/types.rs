@@ -24,3 +24,6 @@ pub use path_options::{Color, LineCap, LineJoin, PathOptions};
 
 mod polygon;
 pub use polygon::Polygon;
+
+mod latlng;
+pub use latlng::LatLng;

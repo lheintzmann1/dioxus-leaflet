@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_leaflet::{Color, CircleMarkerOptions, Map, MapMarker, MapPosition, MarkerType, PathOptions, Polygon};
+use dioxus_leaflet::{Color, CircleMarkerOptions, Map, MapMarker, MapPosition, MarkerType, LatLng, PathOptions, Polygon};
 
 mod jersey;
 
@@ -31,7 +31,7 @@ fn App() -> Element {
             markers: markers,
             polygons: vec![
                 Polygon {
-                    points: jersey::JERSEY_BORDER.into(),
+                    coordinates: jersey::JERSEY_BORDER.into(),
                     title: "Jersey".into(),
                     path_options: Some(PathOptions {
                         color: Color::new([1., 1., 0.]),
@@ -56,8 +56,7 @@ fn App() -> Element {
             onclick: move |_| {
                 if markers.len() > 0 {
                     let mut new_marker = markers.get(markers.len() - 1).unwrap().clone();
-                    new_marker.lat += 0.5;
-                    new_marker.lng += 0.5;
+                    new_marker.coordinates += LatLng::new(0.5, 0.5);
                     markers.push(new_marker);
                 }
             },

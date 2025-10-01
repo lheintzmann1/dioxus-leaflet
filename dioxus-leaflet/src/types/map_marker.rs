@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
-use crate::{MarkerIcon, PathOptions, PopupOptions};
+use crate::{LatLng, MarkerIcon, PathOptions, PopupOptions};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum MarkerType {
@@ -33,8 +33,7 @@ impl Default for CircleMarkerOptions {
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct MapMarker {
     pub r#type: MarkerType,
-    pub lat: f64,
-    pub lng: f64,
+    pub coordinates: LatLng,
     pub title: String,
     pub description: Option<String>,
     pub icon: Option<MarkerIcon>,
@@ -46,8 +45,7 @@ impl MapMarker {
     /// Creates a new MapMarker with basic information
     pub fn new(lat: f64, lng: f64, title: impl Into<String>) -> Self {
         Self {
-            lat,
-            lng,
+            coordinates: LatLng::new(lat, lng),
             title: title.into(),
             ..Default::default()
         }
@@ -92,8 +90,7 @@ impl Default for MapMarker {
     fn default() -> Self {
         Self {
             r#type: MarkerType::Pin,
-            lat: 0.0,
-            lng: 0.0,
+            coordinates: LatLng::default(),
             title: String::new(),
             description: None,
             icon: None,
