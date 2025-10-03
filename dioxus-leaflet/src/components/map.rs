@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 use crate::{interop, MapOptions, MapPosition};
 
+const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
+
 #[derive(Debug, Clone, Copy)]
 pub struct MapContext(pub usize);
 
@@ -12,24 +14,23 @@ pub fn Map(
     initial_position: MapPosition,
     
     /// Height of the map container
-    #[props(default = "500px".to_string())]
-    height: String,
+    #[props(into)]
+    height: Option<String>,
     
     /// Width of the map container
-    #[props(default = "100%".to_string())]
-    width: String,
+    #[props(into)]
+    width: Option<String>,
     
     /// Map configuration options
-    #[props(default = MapOptions::default())]
-    options: MapOptions,
+    options: Option<MapOptions>,
     
     /// Custom CSS class for the map container
-    #[props(default = "".to_string())]
-    class: String,
+    #[props(into)]
+    class: Option<String>,
     
     /// Custom CSS styles for the map container
-    #[props(default = "".to_string())]
-    style: String,
+    #[props(into)]
+    style: Option<String>,
     
     /// Callback when map is clicked
     on_map_click: Option<EventHandler<MapPosition>>,
@@ -37,33 +38,13 @@ pub fn Map(
     /// Callback when map is moved
     on_map_move: Option<EventHandler<MapPosition>>,
 
-    children: Element,
+    children: Option<Element>,
 ) -> Element {
     let context = use_context_provider(|| MapContext(dioxus_core::current_scope_id().unwrap().0));
     let mut load_error: Signal<Option<String>> = use_signal(|| None);
-    
-    let container_style = format!(
-        "position: relative; width: {}; height: {}; {}",
-        width, height, style
-    );
-    
-    let container_class = if class.is_empty() {
-        "dioxus-leaflet-container".to_string()
-    } else {
-        format!("dioxus-leaflet-container {}", class)
-    };
-
-    let css_path = if let Some(_) = options.leaflet_resources.css_integrity() {
-        options.leaflet_resources.css_url()
-    } else {
-        options.leaflet_resources.css_url()
-    };
-
-    let js_path = if let Some(_) = options.leaflet_resources.js_integrity() {
-        options.leaflet_resources.js_url()
-    } else {
-        options.leaflet_resources.js_url()
-    };
+    let options = options.unwrap_or(MapOptions::default());
+    let leaflet_css = options.leaflet_resources.css_url();
+    let leaflet_js = options.leaflet_resources.js_url();
 
     use_effect(move || {
         let id = context.0;
@@ -78,10 +59,12 @@ pub fn Map(
 
     rsx! {
         // Leaflet CSS
-        document::Style { href: css_path }
+        document::Style { href: leaflet_css }
+
+        document::Style { href: MAP_CSS }
         
         // Leaflet JavaScript
-        document::Script { src: js_path }
+        document::Script { src: leaflet_js }
         
         // boot logic
         document::Script { src: interop::DL_JS }
@@ -92,16 +75,14 @@ pub fn Map(
             }
         }
         else {
+            // Map container
             div {
-                class: "{container_class}",
-                style: "{container_style}",
+                class: "dioxus-leaflet-container {class.as_ref().map(|c| c.as_str()).unwrap_or(\"\")}",
 
-                // Map container
+                // Element taken over by leaflet
                 div {
                     id: "dioxus-leaflet-{context.0}",
                     class: "dioxus-leaflet-map",
-                    style: "width: 100%; height: 100%; z-index: 1;",
-
                     {children}
                 }
             }

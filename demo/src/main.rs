@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
-use dioxus_leaflet::{Color, CircleMarkerOptions, Map, Marker, MarkerProps, MapPosition, MarkerType, LatLng, PathOptions, Polygon};
+use dioxus_leaflet::{Color, Map, Marker, MarkerProps, MapPosition, Popup, LatLng, PathOptions, Polygon};
 
 mod jersey;
+
+const CSS: Asset = asset!("/assets/demo.scss");
 
 #[component]
 fn App() -> Element {
@@ -25,13 +27,17 @@ fn App() -> Element {
     ];
 
     rsx! {
+        document::Style { href: CSS }
         Map {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
-            height: "500px",
-            width: "100%",
             for i in 0..markers.len() {
                 Marker {
                     coordinate: markers.map(move |v| &v[i]),
+                    Popup {
+                        b { "Title {i}" }
+                        br {}
+                        "Description {i}"
+                    }
                 }
             }
         }

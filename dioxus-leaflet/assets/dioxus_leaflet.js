@@ -1,6 +1,7 @@
 window.DioxusLeaflet = class DioxusLeaflet {
     static _maps = new Map();
     static _markers = new Map();
+    static _popups = new Map();
     static _polygons = {};
 
     static async updateMapAsync(recv, send) {
@@ -53,7 +54,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
             this.updateMarker(options);
         }
         catch (e) {
-            console.error("Error updating dioxus leaflet map:", e);
+            console.error("Error updating dioxus leaflet marker:", e);
             error = e.toString();
         }
         finally {
@@ -63,9 +64,8 @@ window.DioxusLeaflet = class DioxusLeaflet {
 
     static updateMarker({ map_id, marker_id, coordinate, icon }) {
         const map = this._maps.get(map_id);
-        const markers = this._markers.get(map_id) ?? new Map();
-        this._markers.set(map_id, markers);
-        const marker = markers.get(marker_id) ?? L.marker([0, 0]).addTo(map);
+        const marker = this._markers.get(marker_id) ?? L.marker([0, 0]).addTo(map);
+        this._markers.set(marker_id, marker);
 
         marker.setLatLng(coordinate);
 
@@ -73,26 +73,40 @@ window.DioxusLeaflet = class DioxusLeaflet {
         if (icon) {
             marker.setIcon(L.icon(icon));
         }
-        
-        // Add popup if title or description exists
-        // if (markerData.title || markerData.description) {
-        //     var popupContent = '';
-        //     if (markerData.title) {
-        //         popupContent += '<b>' + markerData.title + '</b>';
-        //     }
-        //     if (markerData.description) {
-        //         if (markerData.title) popupContent += '<br>';
-        //         popupContent += markerData.description;
-        //     }
-            
-        //     var popupOptions = {};
-        //     if (markerData.popup_options) {
-        //         Object.assign(popupOptions, markerData.popup_options);
-        //     }
-            
-        //     marker.unbindPopup();
-        //     marker.bindPopup(popupContent, popupOptions);
-        // }
+
+        const popup = this._popups.get(marker_id);
+        if (popup) {
+            console.log("Binding popup to", marker_id);
+            marker.unbindPopup();
+            marker.bindPopup(popup.body, popup.options);
+        }
+    }
+
+    static async updatePopupAsync(recv, send) {
+        let options = await recv();
+        let error = null;
+        try {
+            this.updatePopup(options);
+        }
+        catch (e) {
+            console.error("Error updating dioxus leaflet popup:", e);
+            error = e.toString();
+        }
+        finally {
+            send(error);
+        }
+    }
+
+    static updatePopup({ marker_id, body_id, options }) {
+        console.log("Registering popup to", marker_id);
+        const body = document.getElementById(`dioxus-leaflet-popup-${body_id}`);
+        this._popups.set(marker_id, { body, options });
+
+        let marker = this._markers.get(marker_id);
+        if (marker) {
+            marker.unbindPopup();
+            marker.bindPopup(body, options);
+        }
     }
 
     static updatePolygons({ map_id, polygons: data }) {

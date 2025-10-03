@@ -2,10 +2,13 @@ use dioxus::prelude::*;
 use std::collections::HashMap;
 use dioxus_logger::tracing::error;
 
-use crate::{components::map::MapContext, LatLng, MarkerIcon, interop};
-
-#[derive(Debug, Clone, Copy)]
-pub struct MarkerContext(pub usize);
+use crate::{
+    components::map::MapContext, 
+    components::popup::PopupContext,
+    LatLng, 
+    MarkerIcon, 
+    interop,
+};
 
 #[component]
 pub fn Marker(
@@ -16,9 +19,11 @@ pub fn Marker(
 
     #[props(default = None)]
     custom_data: ReadOnlySignal<Option<HashMap<String, String>>>,
+
+    children: Option<Element>,
 ) -> Element {
     let map: MapContext = use_context();
-    let context: MarkerContext = use_context_provider(|| MarkerContext(dioxus_core::current_scope_id().unwrap().0));
+    let context = use_context_provider(|| PopupContext(dioxus_core::current_scope_id().unwrap().0));
 
     use_effect(move || {
         let coord = coordinate();
@@ -30,5 +35,5 @@ pub fn Marker(
         });
     });
 
-    rsx!()
+    rsx!({children})
 }
