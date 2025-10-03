@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use dioxus_leaflet::{Color, Map, Marker, MarkerProps, MapPosition, Popup, LatLng, PathOptions, Polygon};
+use dioxus_leaflet::{Color, Map, Marker, MapPosition, Popup, LatLng, PathOptions, Polygon};
 
 mod jersey;
 
@@ -12,19 +12,6 @@ fn App() -> Element {
         LatLng::new(48.8566, 2.3522),
         LatLng::new(52.52, 13.4),
     ]);
-
-    let polygons = vec![
-        Polygon {
-            coordinates: jersey::JERSEY_BORDER.into(),
-            title: "Jersey".into(),
-            path_options: Some(PathOptions {
-                color: Color::new([1., 1., 0.]),
-                fill_color: Color::new([1., 1., 0.]),
-                ..Default::default()
-            }),
-            ..Default::default()
-        },
-    ];
 
     rsx! {
         document::Style { href: CSS }
@@ -40,6 +27,20 @@ fn App() -> Element {
                     }
                 }
             }
+            Polygon {
+                coordinates: Vec::from(&jersey::JERSEY_BORDER),
+                options: PathOptions {
+                    color: Color::new([1., 1., 0.]),
+                    fill: true,
+                    fill_color: Color::new([1., 1., 0.]),
+                    ..Default::default()
+                },
+                Popup {
+                    b { "Jersey" }
+                    br {}
+                    "Jersey"
+                }
+            } 
         }
         button {
             onclick: move |_| {

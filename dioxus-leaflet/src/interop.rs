@@ -1,7 +1,8 @@
 use dioxus::prelude::*;
+use dioxus_logger::tracing::info;
 use serde::Serialize;
 
-use crate::{LatLng, MapMarker, MapOptions, MapPosition, MarkerIcon, Polygon, PopupOptions};
+use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions};
 
 pub const DL_JS: Asset = asset!("/assets/dioxus_leaflet.js");
 
@@ -24,6 +25,13 @@ while (!window.L || !window.DioxusLeaflet) {
     await new Promise(cb => setTimeout(cb, 100));
 }
 await window.DioxusLeaflet.updatePopupAsync(() => dioxus.recv(), (x) => dioxus.send(x));
+"#;
+
+const CALL_POLYGON_JS: &str = r#"
+while (!window.L || !window.DioxusLeaflet) {
+    await new Promise(cb => setTimeout(cb, 100));
+}
+await window.DioxusLeaflet.updatePolygonAsync(() => dioxus.recv(), (x) => dioxus.send(x));
 "#;
 
 #[derive(Serialize)]
@@ -99,6 +107,37 @@ pub async fn update_popup(
     let mut eval = document::eval(CALL_POPUP_JS);
 
     eval.send(PopupProps { marker_id, body_id, options })
+        .map_err(|e| e.to_string())?;
+
+    let ret = eval.recv::<Option<String>>().await
+        .map_err(|e| e.to_string())?;
+
+    if let Some(e) = ret {
+        Err(e)
+    }
+    else {
+        Ok(())
+    }
+}
+
+#[derive(Serialize)]
+struct PolygonProps<'a> {
+    pub map_id: usize,
+    pub polygon_id: usize,
+    pub coordinates: &'a Vec<LatLng>,
+    pub options: &'a PathOptions,
+}
+
+pub async fn update_polygon(
+    map_id: usize,
+    polygon_id: usize,
+    coordinates: &Vec<LatLng>,
+    options: &PathOptions,
+) -> Result<(), String> {
+    info!("Calling JS for polygon");
+    let mut eval = document::eval(CALL_POLYGON_JS);
+
+    eval.send(PolygonProps { map_id, polygon_id, coordinates, options })
         .map_err(|e| e.to_string())?;
 
     let ret = eval.recv::<Option<String>>().await

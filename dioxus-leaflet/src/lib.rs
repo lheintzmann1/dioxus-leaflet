@@ -81,11 +81,25 @@
 //! }
 //! ```
 
-pub mod components;
-pub mod types;
-pub mod interop;
+mod components;
+mod types;
+mod interop;
 
 // Re-export main types and components
-pub use components::*;
-pub use types::*;
-pub use interop::*;
+pub use components::{
+    Map, 
+    Marker, 
+    Polygon, 
+    Popup,
+};
+pub use types::{
+    Color, 
+    LatLng, 
+    LeafletResources, 
+    MapOptions, 
+    MapPosition, 
+    MarkerIcon, 
+    PathOptions, 
+    PopupOptions, 
+    TileLayer,
+};
