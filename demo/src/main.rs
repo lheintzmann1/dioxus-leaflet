@@ -8,9 +8,9 @@ const CSS: Asset = asset!("/assets/demo.scss");
 #[component]
 fn App() -> Element {
     let mut markers = use_signal(|| vec![
-        LatLng::new(51.505, -0.09),
-        LatLng::new(48.8566, 2.3522),
-        LatLng::new(52.52, 13.4),
+        ("London", "Capital of the UK", LatLng::new(51.505, -0.09)),
+        ("Paris", "Capital of France", LatLng::new(48.8566, 2.3522)),
+        ("Berlin", "Capital of Germany", LatLng::new(52.52, 13.4)),
     ]);
 
     rsx! {
@@ -19,11 +19,11 @@ fn App() -> Element {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
             for i in 0..markers.len() {
                 Marker {
-                    coordinate: markers.map(move |v| &v[i]),
+                    coordinate: markers.map(move |v| &v[i].2),
                     Popup {
-                        b { "Title {i}" }
+                        b { "{&markers.get(i).unwrap().0}" }
                         br {}
-                        "Description {i}"
+                        "{&markers.get(i).unwrap().1}"
                     }
                 }
             }

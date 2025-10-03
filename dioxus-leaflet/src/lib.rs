@@ -94,12 +94,15 @@ pub use components::{
 };
 pub use types::{
     Color, 
+    LineCap,
+    LineJoin,
+    PathOptions, 
+    
     LatLng, 
-    LeafletResources, 
+    LeafletResources,
     MapOptions, 
     MapPosition, 
     MarkerIcon, 
-    PathOptions, 
     PopupOptions, 
     TileLayer,
 };

@@ -1,5 +1,4 @@
 use dioxus::prelude::*;
-use dioxus_logger::tracing::info;
 use serde::Serialize;
 
 use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions};
@@ -93,20 +92,22 @@ pub async fn update_marker(
 }
 
 #[derive(Serialize)]
-struct PopupProps<'a> {
-    pub marker_id: usize,
-    pub body_id: usize,
-    pub options: &'a PopupOptions,
+struct PolygonProps<'a> {
+    pub map_id: usize,
+    pub polygon_id: usize,
+    pub coordinates: &'a Vec<LatLng>,
+    pub options: &'a PathOptions,
 }
 
-pub async fn update_popup(
-    marker_id: usize,
-    body_id: usize,
-    options: &PopupOptions,
+pub async fn update_polygon(
+    map_id: usize,
+    polygon_id: usize,
+    coordinates: &Vec<LatLng>,
+    options: &PathOptions,
 ) -> Result<(), String> {
-    let mut eval = document::eval(CALL_POPUP_JS);
+    let mut eval = document::eval(CALL_POLYGON_JS);
 
-    eval.send(PopupProps { marker_id, body_id, options })
+    eval.send(PolygonProps { map_id, polygon_id, coordinates, options })
         .map_err(|e| e.to_string())?;
 
     let ret = eval.recv::<Option<String>>().await
@@ -121,23 +122,20 @@ pub async fn update_popup(
 }
 
 #[derive(Serialize)]
-struct PolygonProps<'a> {
-    pub map_id: usize,
-    pub polygon_id: usize,
-    pub coordinates: &'a Vec<LatLng>,
-    pub options: &'a PathOptions,
+struct PopupProps<'a> {
+    pub marker_id: usize,
+    pub body_id: usize,
+    pub options: &'a PopupOptions,
 }
 
-pub async fn update_polygon(
-    map_id: usize,
-    polygon_id: usize,
-    coordinates: &Vec<LatLng>,
-    options: &PathOptions,
+pub async fn update_popup(
+    marker_id: usize,
+    body_id: usize,
+    options: &PopupOptions,
 ) -> Result<(), String> {
-    info!("Calling JS for polygon");
-    let mut eval = document::eval(CALL_POLYGON_JS);
+    let mut eval = document::eval(CALL_POPUP_JS);
 
-    eval.send(PolygonProps { map_id, polygon_id, coordinates, options })
+    eval.send(PopupProps { marker_id, body_id, options })
         .map_err(|e| e.to_string())?;
 
     let ret = eval.recv::<Option<String>>().await
