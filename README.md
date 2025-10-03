@@ -38,7 +38,7 @@ Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
 dioxus-leaflet = "0.2.0"
-dioxus = "0.6.3"
+dioxus = "0.7.0-rc.0"
 ```
 
 ## Quick Start
@@ -47,22 +47,30 @@ Here's a simple example to get you started:
 
 ```rust
 use dioxus::prelude::*;
-use dioxus_leaflet::{Map, MapPosition, MapMarker};
+use dioxus_leaflet::{Map, MapPosition, Marker, Popup};
 
 fn App() -> Element {
-    let markers = vec![
-        MapMarker::new(51.505, -0.09, "London")
-            .with_description("Capital of England"),
-        MapMarker::new(48.8566, 2.3522, "Paris")
-            .with_description("Capital of France"),
-    ];
-
     rsx! {
         Map {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
-            markers: markers,
             height: "500px",
-            width: "100%"
+            width: "100%",
+            Marker {
+                coordinate: LatLng::new(51.505, -0.09),
+                Popup {
+                    b { "London" }
+                    br { }
+                    "Capital of England"
+                }
+            }
+            Marker {
+                coordinate: LatLng::new(48.8566, 2.3522),
+                Popup {
+                    b { "Paris" }
+                    br { }
+                    "Capital of France"
+                }
+            }
         }
     }
 }

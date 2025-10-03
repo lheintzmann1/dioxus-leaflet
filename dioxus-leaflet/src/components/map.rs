@@ -33,10 +33,10 @@ pub fn Map(
     style: Option<String>,
     
     /// Callback when map is clicked
-    on_map_click: Option<EventHandler<MapPosition>>,
+    on_click: Option<EventHandler<MapPosition>>,
     
     /// Callback when map is moved
-    on_map_move: Option<EventHandler<MapPosition>>,
+    on_move: Option<EventHandler<MapPosition>>,
 
     children: Option<Element>,
 ) -> Element {

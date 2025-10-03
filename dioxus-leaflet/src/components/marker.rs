@@ -20,6 +20,8 @@ pub fn Marker(
     #[props(default = None)]
     custom_data: ReadOnlySignal<Option<HashMap<String, String>>>,
 
+    on_click: Option<EventHandler>,
+
     children: Option<Element>,
 ) -> Element {
     let map: MapContext = use_context();
