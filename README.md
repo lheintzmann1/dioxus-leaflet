@@ -9,15 +9,15 @@ A general-purpose [Leaflet](https://leafletjs.com/) map component for [Dioxus](h
 
 ## Features
 
-- **Easy-to-use map component** with customizable markers
+- **Component-based map objects** - intuitive Dioxus components for markers, polygons, and popups
 - **Interactive markers** with popups and custom styling
-- **Extensible marker system** with custom icons and data
+- **Reactive map components** that auto-update when your data changes
 - **Flexible Leaflet integration** - CDN with version selection or local files
 - **Configurable Leaflet resources** with integrity checking for security
 - **Responsive design** with customizable dimensions
 - **Customizable tile layers** including OpenStreetMap and satellite imagery
 - **Configurable map options** for zoom, dragging, and interaction controls
-- **Event handling** for map clicks, marker clicks, and map movements
+- **Event handling** for map clicks and movements
 
 ## Screenshots
 
@@ -84,22 +84,45 @@ fn main() {
 
 ### Map Component
 
-The main `Map` component provides a full-featured Leaflet map:
+The main `Map` component provides a full-featured Leaflet map. It can contain child components like `Marker` and `Polygon`:
 
 ```rust
 rsx! {
     Map {
         initial_position: MapPosition::new(51.505, -0.09, 13.0),
-        markers: markers,
         height: "400px",
         width: "100%",
         class: "my-custom-map",
         style: "border: 1px solid #ccc;",
-        on_marker_click: move |marker| {
-            println!("Marker clicked: {}", marker.title);
+        on_click: move |pos| {
+            println!("Map clicked at: {}", pos);
         },
-        on_map_click: move |position| {
-            println!("Map clicked at: {}, {}", position.lat, position.lng);
+        // Add markers as child components
+        Marker {
+            coordinate: LatLng::new(51.505, -0.09),
+            // Add popup as child of marker
+            Popup {
+                b { "London" }
+                br {}
+                "Capital of England"
+            }
+        }
+        // Add polygons as child components
+        Polygon {
+            coordinates: vec![
+                LatLng::new(51.5, -0.1),
+                LatLng::new(51.5, 0.0),
+                LatLng::new(51.4, 0.0),
+            ],
+            options: PathOptions {
+                color: Color::new([1., 0., 0.]),
+                fill: true,
+                ..Default::default()
+            },
+            // Add popup to polygon too
+            Popup {
+                "A red triangle"
+            }
         }
     }
 }

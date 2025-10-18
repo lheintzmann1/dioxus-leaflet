@@ -52,11 +52,16 @@ fn App() -> Element {
         }
         button {
             onclick: move |_| {
-                // if markers.len() > 0 {
-                //     let mut new_marker = markers.get(markers.len() - 1).unwrap().clone();
-                //     new_marker.coordinates += LatLng::new(0.5, 0.5);
-                //     markers.push(new_marker);
-                // }
+                if let Some(last) = markers().last() {
+                    let new_lat_lng = last.2 + LatLng::new(0.5, 0.5);
+                    let mut new_markers = markers().to_vec();
+                    new_markers.push((
+                        "New City",
+                        "A new location",
+                        new_lat_lng
+                    ));
+                    markers.set(new_markers);
+                }
             },
             "Add Marker"
         }
