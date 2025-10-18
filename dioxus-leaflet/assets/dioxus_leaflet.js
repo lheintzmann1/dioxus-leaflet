@@ -1,15 +1,13 @@
 window.DioxusLeaflet = class DioxusLeaflet {
-    static _maps = {};
-    static _markers = {};
-    static _polygons = {};
+    static _maps = new Map();
+    static _objects = new Map();
+    static _popups = new Map();
 
-    static async updateAsync(recv, send) {
+    static async updateMapAsync(recv, send) {
         let options = await recv();
         let error = null;
         try {
-            this.initialize(options);
-            this.updateMarkers(options);
-            this.updatePolygons(options);
+            this.updateMap(options);
         }
         catch (e) {
             console.error("Error updating dioxus leaflet map:", e);
@@ -20,13 +18,9 @@ window.DioxusLeaflet = class DioxusLeaflet {
         }
     }
 
-    static initialize({ map_id, initial_position, options }) {
-        if (this._maps[map_id]) {
-            return;
-        }
-
+    static updateMap({ map_id, initial_position, options }) {
         // Initialize the map with options
-        const map = this._maps[map_id] = L.map(map_id, {
+        const map = this._maps.get(map_id) ?? L.map(`dioxus-leaflet-${map_id}`, {
             zoomControl: options.zoom_control,
             scrollWheelZoom: options.scroll_wheel_zoom,
             doubleClickZoom: options.double_click_zoom,
@@ -34,7 +28,10 @@ window.DioxusLeaflet = class DioxusLeaflet {
             dragging: options.dragging,
             keyboard: options.keyboard,
             attributionControl: options.attribution_control
-        }).setView(initial_position.coordinates, initial_position.zoom);
+        });
+        this._maps.set(map_id, map);
+
+        map.setView(initial_position.coordinates, initial_position.zoom);
 
         // Add tile layer
         L.tileLayer(options.tile_layer.url, {
@@ -49,99 +46,91 @@ window.DioxusLeaflet = class DioxusLeaflet {
         }, 100);
     }
 
-    static updateMarkers({ map_id, markers: data }) {
-        const map = this._maps[map_id];
-        const markers = this._markers[map_id] ??= [];
-
-        // Add markers
-        for (let i = 0; i < data.length; i++) {
-            const markerData = data[i];
-
-            let marker = markers[i];
-            if (markerData.type?.Circle && (!marker || !(marker instanceof L.CircleMarker))) {
-                if (marker) {
-                    marker.remove();
-                }
-                marker = L.circleMarker([0, 0], markerData.type.Circle);
-            } else if (markerData.type === "Pin" && (!marker || !(marker instanceof L.Marker))) {
-                if (marker) {
-                    marker.remove();
-                }
-                marker = L.marker([0, 0]);
-            }
-
-            marker.addTo(map);
-            markers[i] = marker;
-            marker.setLatLng(markerData.coordinates);
-
-            // Custom icon if provided
-            if (markerData.icon) {
-                marker.setIcon(L.icon(markerData.icon));
-            }
-            
-            // Add popup if title or description exists
-            if (markerData.title || markerData.description) {
-                var popupContent = '';
-                if (markerData.title) {
-                    popupContent += '<b>' + markerData.title + '</b>';
-                }
-                if (markerData.description) {
-                    if (markerData.title) popupContent += '<br>';
-                    popupContent += markerData.description;
-                }
-                
-                var popupOptions = {};
-                if (markerData.popup_options) {
-                    Object.assign(popupOptions, markerData.popup_options);
-                }
-                
-                marker.unbindPopup();
-                marker.bindPopup(popupContent, popupOptions);
-            }
+    static async updateMarkerAsync(recv, send) {
+        let options = await recv();
+        let error = null;
+        try {
+            this.updateMarker(options);
         }
-
-        // remove markers
-        for (let i = data.length; i < markers.length; i++) {
-            markers[i].remove();
+        catch (e) {
+            console.error("Error updating dioxus leaflet marker:", e);
+            error = e.toString();
         }
-        markers.length = data.length;
+        finally {
+            send(error);
+        }
     }
 
-    static updatePolygons({ map_id, polygons: data }) {
-        const map = this._maps[map_id];
-        const gons = this._polygons[map_id] ??= [];
+    static updateMarker({ map_id, marker_id, coordinate, icon }) {
+        const map = this._maps.get(map_id);
+        const marker = this._objects.get(marker_id) ?? L.marker([0, 0]).addTo(map);
+        this._objects.set(marker_id, marker);
 
-        // add polygons
-        for (let i = 0; i < data.length; i++) {
-            let gonData = data[i];
-
-            let gon = gons[i] ??= L.polygon(gonData.coordinates, gonData.path_options).addTo(map);
-
-            // Add popup if title or description exists
-            if (gonData.title || gonData.description) {
-                var popupContent = '';
-                if (gonData.title) {
-                    popupContent += '<b>' + gonData.title + '</b>';
-                }
-                if (gonData.description) {
-                    if (gonData.title) popupContent += '<br>';
-                    popupContent += gonData.description;
-                }
-                
-                var popupOptions = {};
-                if (gonData.popup_options) {
-                    Object.assign(popupOptions, gonData.popup_options);
-                }
-                
-                gon.unbindPopup();
-                gon.bindPopup(popupContent, popupOptions);
-            }
+        marker.setLatLng(coordinate);
+        if (icon) {
+            marker.setIcon(L.icon(icon));
         }
 
-        // remove polygons
-        for (let i = data.length; i < gons.length; i++) {
-            gons[i].remove();
+        const popup = this._popups.get(marker_id);
+        if (popup) {
+            marker.unbindPopup();
+            marker.bindPopup(popup.body, popup.options);
         }
-        gons.length = data.length;
+    }
+
+    static async updatePolygonAsync(recv, send) {
+        let options = await recv();
+        let error = null;
+        try {
+            this.updatePolygon(options);
+        }
+        catch (e) {
+            console.error("Error updating dioxus leaflet polygon:", e);
+            error = e.toString();
+        }
+        finally {
+            send(error);
+        }
+    }
+
+    static updatePolygon({ map_id, polygon_id, coordinates, options }) {
+        const map = this._maps.get(map_id);
+        const gon = this._objects.get(polygon_id) ?? L.polygon([]).addTo(map);
+        this._objects.set(polygon_id, gon);
+
+        gon.setLatLngs(coordinates);
+        gon.setStyle(options);
+
+        const popup = this._popups.get(polygon_id);
+        if (popup) {
+            gon.unbindPopup();
+            gon.bindPopup(popup.body, popup.options);
+        }
+    }
+
+    static async updatePopupAsync(recv, send) {
+        let options = await recv();
+        let error = null;
+        try {
+            this.updatePopup(options);
+        }
+        catch (e) {
+            console.error("Error updating dioxus leaflet popup:", e);
+            error = e.toString();
+        }
+        finally {
+            send(error);
+        }
+    }
+
+    static updatePopup({ marker_id, body_id, options }) {
+        const body = document.getElementById(`dioxus-leaflet-popup-${body_id}`);
+        this._popups.set(marker_id, { body, options });
+
+        let marker = this._objects.get(marker_id);
+        if (marker) {
+            marker.unbindPopup();
+            marker.bindPopup(body, options);
+        }
     }
 }

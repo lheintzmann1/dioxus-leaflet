@@ -15,20 +15,22 @@
 //! 
 //! ```rust
 //! use dioxus::prelude::*;
-//! use dioxus_leaflet::{Map, MapPosition, MapMarker};
+//! use dioxus_leaflet::{LatLng, Map, MapPosition, Marker, Popup};
 //! 
 //! fn App() -> Element {
-//!     let markers = vec![
-//!         MapMarker::new(51.505, -0.09, "London")
-//!             .with_description("Capital of England")
-//!     ];
-//! 
 //!     rsx! {
 //!         Map {
 //!             initial_position: MapPosition::new(51.505, -0.09, 13.0),
-//!             markers: markers,
 //!             height: "400px",
-//!             width: "100%"
+//!             width: "100%",
+//!             Marker {
+//!                 coordinate: LatLng::new(51.505, -0.09),
+//!                 Popup {
+//!                     b { "London" }
+//!                     br { }
+//!                     "Capital of England"
+//!                 }
+//!             }
 //!         }
 //!     }
 //! }
@@ -81,11 +83,28 @@
 //! }
 //! ```
 
-pub mod components;
-pub mod types;
-pub mod interop;
+mod components;
+mod types;
+mod interop;
 
 // Re-export main types and components
-pub use components::*;
-pub use types::*;
-pub use interop::*;
+pub use components::{
+    Map, 
+    Marker, 
+    Polygon, 
+    Popup,
+};
+pub use types::{
+    Color, 
+    LineCap,
+    LineJoin,
+    PathOptions, 
+    
+    LatLng, 
+    LeafletResources,
+    MapOptions, 
+    MapPosition, 
+    MarkerIcon, 
+    PopupOptions, 
+    TileLayer,
+};
