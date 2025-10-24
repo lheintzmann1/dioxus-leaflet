@@ -12,20 +12,20 @@ use crate::{
 
 #[component]
 pub fn Marker(
-    coordinate: ReadOnlySignal<LatLng>,
+    coordinate: ReadSignal<LatLng>,
 
     #[props(default = None)]
-    icon: ReadOnlySignal<Option<MarkerIcon>>,
+    icon: ReadSignal<Option<MarkerIcon>>,
 
     #[props(default = None)]
-    custom_data: ReadOnlySignal<Option<HashMap<String, String>>>,
+    custom_data: ReadSignal<Option<HashMap<String, String>>>,
 
     on_click: Option<EventHandler>,
 
     children: Option<Element>,
 ) -> Element {
     let map: MapContext = use_context();
-    let context = use_context_provider(|| PopupContext(dioxus_core::current_scope_id().unwrap().0));
+    let context = use_context_provider(|| PopupContext(dioxus_core::current_scope_id().0));
 
     use_effect(move || {
         let coord = coordinate();

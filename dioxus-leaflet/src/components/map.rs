@@ -40,7 +40,7 @@ pub fn Map(
 
     children: Option<Element>,
 ) -> Element {
-    let context = use_context_provider(|| MapContext(dioxus_core::current_scope_id().unwrap().0));
+    let context = use_context_provider(|| MapContext(dioxus_core::current_scope_id().0));
     let mut load_error: Signal<Option<String>> = use_signal(|| None);
     let options = options.unwrap_or(MapOptions::default());
     let leaflet_css = options.leaflet_resources.css_url();
