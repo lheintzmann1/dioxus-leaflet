@@ -13,7 +13,7 @@ pub fn Popup(
     children: Element,
 ) -> Element {
     let marker: PopupContext = use_context();
-    let popup_id = dioxus_core::current_scope_id().unwrap().0;
+    let popup_id = dioxus_core::current_scope_id().0;
     let class = options.class_name.clone();
 
     use_effect(move || {
