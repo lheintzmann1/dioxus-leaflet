@@ -1,5 +1,5 @@
 use dioxus::prelude::*;
-use crate::{interop, MapOptions, MapPosition};
+use crate::{interop, LatLng, MapOptions, MapPosition};
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
 
@@ -33,7 +33,7 @@ pub fn Map(
     style: Option<String>,
     
     /// Callback when map is clicked
-    on_click: Option<EventHandler<MapPosition>>,
+    on_click: Option<EventHandler<LatLng>>,
     
     /// Callback when map is moved
     on_move: Option<EventHandler<MapPosition>>,
@@ -52,6 +52,9 @@ pub fn Map(
         let opts = options.clone();
         spawn(async move {
             if let Err(e) = interop::update_map(id, &pos, &opts).await {
+                load_error.set(Some(e));
+            }
+            if let Err(e) = interop::register_onclick_handler_map(id, on_click).await {
                 load_error.set(Some(e));
             }
         });

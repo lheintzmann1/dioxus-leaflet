@@ -18,6 +18,15 @@ window.DioxusLeaflet = class DioxusLeaflet {
         }
     }
 
+    static async registerOnClickHandlerMapAsync(recv, send) {
+        let {map_id} = await recv();
+        const map = this._maps.get(map_id);
+        map.on('click', (e) => {
+            send(e.latlng);
+        })
+
+    }
+
     static updateMap({ map_id, initial_position, options }) {
         // Initialize the map with options
         const map = this._maps.get(map_id) ?? L.map(`dioxus-leaflet-${map_id}`, {
@@ -128,6 +137,7 @@ window.DioxusLeaflet = class DioxusLeaflet {
         this._popups.set(marker_id, { body, options });
 
         let marker = this._objects.get(marker_id);
+        console.log(this._objects);
         if (marker) {
             marker.unbindPopup();
             marker.bindPopup(body, options);
