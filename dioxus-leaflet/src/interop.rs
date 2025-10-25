@@ -12,6 +12,13 @@ while (!window.L || !window.DioxusLeaflet) {
 await window.DioxusLeaflet.updateMapAsync(() => dioxus.recv(), (x) => dioxus.send(x));
 "#;
 
+const CALL_REGISTER_ONCLICK_HANDLER_MAP_JS: &str = r#"
+while (!window.L || !window.DioxusLeaflet) {
+    await new Promise(cb => setTimeout(cb, 100));
+}
+await window.DioxusLeaflet.registerOnClickHandlerMapAsync(() => dioxus.recv(), (x) => dioxus.send(x));
+"#;
+
 const CALL_MARKER_JS: &str = r#"
 while (!window.L || !window.DioxusLeaflet) {
     await new Promise(cb => setTimeout(cb, 100));
@@ -59,6 +66,32 @@ pub async fn update_map(
     else {
         Ok(())
     }
+}
+
+#[derive(Serialize)]
+pub struct MapId {
+    map_id: usize
+}
+
+pub async fn register_onclick_handler_map(
+    map_id: usize,
+    event_handler: Option<EventHandler<LatLng>>
+) -> Result<(), String> {
+    let mut eval = document::eval(CALL_REGISTER_ONCLICK_HANDLER_MAP_JS);
+
+    eval.send(MapId { map_id })
+        .map_err(|e| e.to_string())?;
+
+    if let Some(handler) = event_handler {
+        spawn(async move {
+            loop {
+                if let Ok(Some(ret)) = eval.recv::<Option<LatLng>>().await {
+                    handler.call(ret);
+                }
+            }
+        });
+    };
+    Ok(())
 }
 
 #[derive(Serialize)]
