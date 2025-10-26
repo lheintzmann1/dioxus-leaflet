@@ -17,13 +17,18 @@ fn App() -> Element {
         document::Style { href: CSS }
         Map {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
-            for i in 0..markers.len() {
+            on_click: move |pos: LatLng| {
+                if let Some(marker) = markers.write().last_mut() {
+                    marker.2 = pos;
+                }
+            },
+            for marker in markers() {
                 Marker {
-                    coordinate: markers.map(move |v| &v[i].2),
+                    coordinate: marker.2,
                     Popup {
-                        b { "{&markers.get(i).unwrap().0}" }
+                        b { "{marker.0}"}
                         br {}
-                        "{&markers.get(i).unwrap().1}"
+                        "{marker.1}"
                     }
                 }
             }
@@ -54,13 +59,11 @@ fn App() -> Element {
             onclick: move |_| {
                 if let Some(last) = markers().last() {
                     let new_lat_lng = last.2 + LatLng::new(0.5, 0.5);
-                    let mut new_markers = markers().to_vec();
-                    new_markers.push((
+                    markers.write().push((
                         "New City",
                         "A new location",
                         new_lat_lng
                     ));
-                    markers.set(new_markers);
                 }
             },
             "Add Marker"
