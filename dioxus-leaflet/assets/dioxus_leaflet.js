@@ -137,7 +137,6 @@ window.DioxusLeaflet = class DioxusLeaflet {
         this._popups.set(marker_id, { body, options });
 
         let marker = this._objects.get(marker_id);
-        console.log(this._objects);
         if (marker) {
             marker.unbindPopup();
             marker.bindPopup(body, options);
