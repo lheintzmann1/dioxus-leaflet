@@ -12,6 +12,13 @@ while (!window.L || !window.DioxusLeaflet) {
 await window.DioxusLeaflet.updateMapAsync(() => dioxus.recv(), (x) => dioxus.send(x));
 "#;
 
+const DELETE_MAP_JS: &str = r#"
+while (!window.L || !window.DioxusLeaflet) {
+    await new Promise(cb => setTimeout(cb, 100));
+}
+await window.DioxusLeaflet.deleteMap(() => dioxus.recv());
+"#;
+
 const CALL_REGISTER_ONCLICK_HANDLER_MAP_JS: &str = r#"
 while (!window.L || !window.DioxusLeaflet) {
     await new Promise(cb => setTimeout(cb, 100));
@@ -24,6 +31,13 @@ while (!window.L || !window.DioxusLeaflet) {
     await new Promise(cb => setTimeout(cb, 100));
 }
 await window.DioxusLeaflet.updateMarkerAsync(() => dioxus.recv(), (x) => dioxus.send(x));
+"#;
+
+const DELETE_MARKER_JS: &str = r#"
+while (!window.L || !window.DioxusLeaflet) {
+    await new Promise(cb => setTimeout(cb, 100));
+}
+await window.DioxusLeaflet.deleteMarker(() => dioxus.recv());
 "#;
 
 const CALL_POPUP_JS: &str = r#"
@@ -66,6 +80,12 @@ pub async fn update_map(
     else {
         Ok(())
     }
+}
+
+pub fn delete_map(map_id: usize) -> Result<(), String> {
+    let eval = document::eval(DELETE_MAP_JS);
+    eval.send(MapId { map_id})
+        .map_err(|e| e.to_string())
 }
 
 #[derive(Serialize)]
@@ -122,6 +142,18 @@ pub async fn update_marker(
     else {
         Ok(())
     }
+}
+
+#[derive(Serialize)]
+pub struct MarkerId {
+    pub map_id: usize,
+    pub marker_id: usize
+}
+
+pub fn delete_marker(marker_id: MarkerId) -> Result<(), String> {
+    let eval = document::eval(DELETE_MARKER_JS);
+    eval.send(marker_id)
+        .map_err(|e| e.to_string()) 
 }
 
 #[derive(Serialize)]
