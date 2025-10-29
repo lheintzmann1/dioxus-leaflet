@@ -18,6 +18,22 @@ window.DioxusLeaflet = class DioxusLeaflet {
         }
     }
 
+    static async deleteMap(recv) {
+        let {map_id} = await recv();
+        this._maps.delete(map_id);
+    }
+
+    static async deleteMarker(recv) {
+        let {map_id, marker_id} = await recv();
+        const marker = this._objects.get(marker_id);
+        if (!marker) {
+            return;
+        }
+        const map = this._maps.get(map_id);
+        map.removeLayer(marker);
+        this._objects.delete(marker_id);
+    }
+
     static async registerOnClickHandlerMapAsync(recv, send) {
         let {map_id} = await recv();
         const map = this._maps.get(map_id);

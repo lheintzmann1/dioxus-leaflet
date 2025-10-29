@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{core::use_drop, prelude::*};
 use crate::{interop, LatLng, MapOptions, MapPosition};
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
@@ -58,6 +58,12 @@ pub fn Map(
                 load_error.set(Some(e));
             }
         });
+    });
+
+    use_drop(move ||  { 
+        if let Err(e) = interop::delete_map(context.0) {
+            load_error.set(Some(e));
+        }
     });
 
     rsx! {

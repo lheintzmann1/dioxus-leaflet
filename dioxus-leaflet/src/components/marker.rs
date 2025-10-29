@@ -1,4 +1,4 @@
-use dioxus::prelude::*;
+use dioxus::{core::use_drop, prelude::*};
 use std::collections::HashMap;
 use dioxus_logger::tracing::error;
 
@@ -35,6 +35,16 @@ pub fn Marker(
                 error!("Error rendering marker: {e}");
             }
         });
+    });
+
+    use_drop(move || {
+        let marker_id = interop::MarkerId{
+            map_id: map.0,
+            marker_id: context.0
+        };
+        if let Err(e) = interop::delete_marker(marker_id) {
+            error!("Error deleting marker: {e}");
+        }
     });
 
     rsx!({children})
