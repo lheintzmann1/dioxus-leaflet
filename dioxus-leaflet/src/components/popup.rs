@@ -1,9 +1,15 @@
 use dioxus::prelude::*;
 use dioxus_logger::tracing::error;
-use crate::{interop, PopupOptions};
+use crate::{interop, PopupOptions, components::MarkerId};
 
-#[derive(Debug, Clone, Copy)]
-pub struct PopupContext(pub usize);
+pub trait PopupContext {
+    fn popup_id(&self) -> usize;
+}
+impl PopupContext for usize {
+    fn popup_id(&self) -> usize {
+        *self
+    }
+}
 
 #[component]
 pub fn Popup(
@@ -12,14 +18,14 @@ pub fn Popup(
 
     children: Element,
 ) -> Element {
-    let marker: PopupContext = use_context();
-    let popup_id = dioxus_core::current_scope_id().0;
+    let marker: MarkerId = use_context();
+    let popup_id = dioxus_core::current_scope_id().0.into();
     let class = options.class_name.clone();
 
     use_effect(move || {
         let opts = options.clone();
         spawn(async move {
-            if let Err(e) = interop::update_popup(marker.0, popup_id, &opts).await {
+            if let Err(e) = interop::update_popup(marker, popup_id, &opts).await {
                 error!("{e}");
             }
         });

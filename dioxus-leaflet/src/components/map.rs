@@ -1,10 +1,27 @@
 use dioxus::{core::use_drop, prelude::*};
-use crate::{interop, LatLng, MapOptions, MapPosition};
+use serde::Serialize;
+use crate::{LatLng, MapOptions, MapPosition, components::popup::PopupContext, interop};
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
 
-#[derive(Debug, Clone, Copy)]
-pub struct MapContext(pub usize);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
+#[serde(transparent)]
+pub struct MapId(pub usize);
+impl PopupContext for MapId {
+    fn popup_id(&self) -> usize {
+        self.0
+    }
+}
+impl Into<f64> for MapId {
+    fn into(self) -> f64 {
+        self.0 as f64
+    }
+}
+impl From<f64> for MapId {
+    fn from(value: f64) -> Self {
+        MapId(value as usize)
+    }
+}
 
 /// Main map component using Leaflet
 #[component]
@@ -40,30 +57,33 @@ pub fn Map(
 
     children: Option<Element>,
 ) -> Element {
-    let context = use_context_provider(|| MapContext(dioxus_core::current_scope_id().0));
+    let context = use_context_provider(|| MapId(dioxus_core::current_scope_id().0));
     let mut load_error: Signal<Option<String>> = use_signal(|| None);
     let options = options.unwrap_or(MapOptions::default());
     let leaflet_css = options.leaflet_resources.css_url();
     let leaflet_js = options.leaflet_resources.js_url();
 
     use_effect(move || {
-        let id = context.0;
+        let id = context.clone();
         let pos = initial_position.clone();
         let opts = options.clone();
         spawn(async move {
             if let Err(e) = interop::update_map(id, &pos, &opts).await {
-                load_error.set(Some(e));
+                load_error.set(Some(e.to_string()));
             }
             if let Err(e) = interop::register_onclick_handler_map(id, on_click).await {
-                load_error.set(Some(e));
+                load_error.set(Some(e.to_string()));
             }
         });
     });
 
-    use_drop(move ||  { 
-        if let Err(e) = interop::delete_map(context.0) {
-            load_error.set(Some(e));
-        }
+    use_drop(move || { 
+        let id = context.clone();
+        spawn(async move {
+            if let Err(e) = interop::delete_map(id).await {
+                load_error.set(Some(e.to_string()));
+            }
+        });
     });
 
     rsx! {
