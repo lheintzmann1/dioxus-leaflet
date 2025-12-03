@@ -1,27 +1,8 @@
 use dioxus::{core::use_drop, prelude::*};
-use serde::Serialize;
-use crate::{LatLng, MapOptions, MapPosition, components::popup::PopupContext, interop};
+use std::rc::Rc;
+use crate::{LatLng, MapOptions, MapPosition, interop, types::Id};
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
-#[serde(transparent)]
-pub struct MapId(pub usize);
-impl PopupContext for MapId {
-    fn popup_id(&self) -> usize {
-        self.0
-    }
-}
-impl Into<f64> for MapId {
-    fn into(self) -> f64 {
-        self.0 as f64
-    }
-}
-impl From<f64> for MapId {
-    fn from(value: f64) -> Self {
-        MapId(value as usize)
-    }
-}
 
 /// Main map component using Leaflet
 #[component]
@@ -57,30 +38,32 @@ pub fn Map(
 
     children: Option<Element>,
 ) -> Element {
-    let context = use_context_provider(|| MapId(dioxus_core::current_scope_id().0));
+    let id = use_context_provider(|| Rc::new(Id::map(dioxus_core::current_scope_id().0)));
     let mut load_error: Signal<Option<String>> = use_signal(|| None);
     let options = options.unwrap_or(MapOptions::default());
     let leaflet_css = options.leaflet_resources.css_url();
     let leaflet_js = options.leaflet_resources.js_url();
 
+    let id2 = id.clone();
     use_effect(move || {
-        let id = context.clone();
+        let id = id2.clone();
         let pos = initial_position.clone();
         let opts = options.clone();
         spawn(async move {
-            if let Err(e) = interop::update_map(id, &pos, &opts).await {
+            if let Err(e) = interop::update_map(&id, &pos, &opts).await {
                 load_error.set(Some(e.to_string()));
             }
-            if let Err(e) = interop::register_onclick_handler_map(id, on_click).await {
+            if let Err(e) = interop::register_onclick_handler_map(&id, on_click).await {
                 load_error.set(Some(e.to_string()));
             }
         });
     });
 
+    let id2 = id.clone();
     use_drop(move || { 
-        let id = context.clone();
+        let id = id2.clone();
         spawn(async move {
-            if let Err(e) = interop::delete_map(id).await {
+            if let Err(e) = interop::delete_map(&id).await {
                 load_error.set(Some(e.to_string()));
             }
         });
@@ -110,7 +93,7 @@ pub fn Map(
 
                 // Element taken over by leaflet
                 div {
-                    id: "dioxus-leaflet-{context.0}",
+                    id: "dioxus-leaflet-{id}",
                     class: "dioxus-leaflet-map",
                     {children}
                 }

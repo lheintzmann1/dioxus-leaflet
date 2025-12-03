@@ -1,14 +1,14 @@
-import type { L, MapId, MarkerId, MarkerIcon } from "./types";
+import type { L, Id, MarkerIcon } from "./types";
 import { get_map } from "./map";
 import { setup } from "./util";
 
-const _markers = new Map<MarkerId, L.Marker>();
+const _markers = new Map<Id, L.Marker>();
 
-export function get_marker(marker_id: MarkerId): L.Marker | undefined {
+export function get_marker(marker_id: Id): L.Marker | undefined {
     return _markers.get(marker_id);
 }
 
-export async function update_marker(map_id: MapId, marker_id: MarkerId, coordinate: L.LatLngExpression, icon?: MarkerIcon) {
+export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.LatLngExpression, icon?: MarkerIcon) {
     const l = await setup();
     const map = get_map(map_id);
     if (!map) {
@@ -37,8 +37,7 @@ export async function update_marker(map_id: MapId, marker_id: MarkerId, coordina
     // }
 }
 
-
-export async function delete_marker(map_id: MapId, marker_id: MarkerId) {
+export async function delete_marker(map_id: Id, marker_id: Id) {
     const l = await setup();
     const map = get_map(map_id);
     if (!map) {

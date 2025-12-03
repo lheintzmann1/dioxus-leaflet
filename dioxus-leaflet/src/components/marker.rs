@@ -1,34 +1,13 @@
 use dioxus::{core::use_drop, prelude::*};
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 use dioxus_logger::tracing::error;
-use serde::Serialize;
 
 use crate::{
-    components::map::MapId, 
-    components::popup::PopupContext,
     LatLng, 
     MarkerIcon, 
     interop,
+    types::Id,
 };
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
-#[serde(transparent)]
-pub struct MarkerId(pub usize);
-impl PopupContext for MarkerId {
-    fn popup_id(&self) -> usize {
-        self.0
-    }
-}
-impl Into<f64> for MarkerId {
-    fn into(self) -> f64 {
-        self.0 as f64
-    }
-}
-impl From<f64> for MarkerId {
-    fn from(value: f64) -> Self {
-        MarkerId(value as usize)
-    }
-}
 
 #[component]
 pub fn Marker(
@@ -44,22 +23,26 @@ pub fn Marker(
 
     children: Option<Element>,
 ) -> Element {
-    let map: MapId = use_context();
-    let id = use_context_provider(|| MarkerId(dioxus_core::current_scope_id().0));
+    let map: Rc<Id> = use_context();
+    let id = use_context_provider(|| Rc::new(Id::marker(&map, dioxus_core::current_scope_id().0)));
 
+    let id2 = id.clone();
     use_effect(move || {
+        let id = id2.clone();
         let coord = coordinate();
         let icon = icon();
         spawn(async move {
-            if let Err(e) = interop::update_marker(map, id, &coord, &icon).await {
+            if let Err(e) = interop::update_marker(&id, &coord, &icon).await {
                 error!("Error rendering marker: {e}");
             }
         });
     });
 
+    let id2 = id.clone();
     use_drop(move || {
+        let id = id2.clone();
         spawn(async move {
-            if let Err(e) = interop::delete_marker(map, id).await {
+            if let Err(e) = interop::delete_marker(&id).await {
                 error!("Error deleting marker: {e}");
             }
         });

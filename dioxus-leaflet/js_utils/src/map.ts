@@ -1,17 +1,17 @@
-import type { L, MapId, MapOptions, MapPosition } from "./types/index";
+import type { L, Id, MapOptions, MapPosition } from "./types/index";
 import { setup, wait } from "./util";
 
-const _maps = new Map<MapId, L.Map>();
+const _maps = new Map<Id, L.Map>();
 
-export function get_map(map_id: MapId): L.Map | undefined {
+export function get_map(map_id: Id): L.Map | undefined {
     return _maps.get(map_id);
 }
 
-export async function update_map(map_id: MapId, initial_position: MapPosition, options: MapOptions): Promise<void> {
+export async function update_map(map_id: Id, initial_position: MapPosition, options: MapOptions): Promise<void> {
     const l = await setup();
 
     // Initialize the map with options
-    const map = _maps.get(map_id) ?? l.map(`dioxus-leaflet-${map_id}`, {
+    const map = _maps.get(map_id) ?? l.map(`dioxus-leaflet-map-${map_id}`, {
         zoomControl: options.zoom_control,
         scrollWheelZoom: options.scroll_wheel_zoom,
         doubleClickZoom: options.double_click_zoom,
@@ -36,6 +36,6 @@ export async function update_map(map_id: MapId, initial_position: MapPosition, o
     map.invalidateSize();
 }
 
-export function delete_map(map_id: MapId) {
+export function delete_map(map_id: Id) {
     _maps.delete(map_id);
 }

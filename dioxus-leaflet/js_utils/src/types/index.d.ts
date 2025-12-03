@@ -1,7 +1,8 @@
 export * as L from "./leaflet";
 
-export type MapId = number;
-export type MarkerId = number;
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+export type Id = number;
 
 export interface MapPosition {
     coordinates: [number, number],

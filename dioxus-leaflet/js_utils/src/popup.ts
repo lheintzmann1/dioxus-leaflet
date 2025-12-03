@@ -1,4 +1,4 @@
-import { MapId, MarkerId, PopupOptions } from "./types";
+import { Id, PopupOptions } from "./types";
 import { get_marker } from "./marker";
 
 type PopupRecord = {
@@ -6,16 +6,17 @@ type PopupRecord = {
     options: PopupOptions,
 };
 
-const _popups = new Map<number, PopupRecord>();
+const _popups = new Map<Id, PopupRecord>();
 
-export async function update_popup(id: number, body_id: number, options: PopupOptions) {
-    const body = document.getElementById(`dioxus-leaflet-popup-${body_id}`);
+export async function update_popup(marker_id: Id, popup_id: Id, options: PopupOptions) {
+    const id = `dioxus-leaflet-popup-${popup_id}`;
+    const body = document.getElementById(id);
     if (!body) {
-        throw new Error(`Popup body element with id dioxus-leaflet-popup-${body_id} not found when updating popup for object ${id}`);
+        throw new Error(`Popup body element with id ${id} not found when updating popup for object ${marker_id}`);
     }
-    _popups.set(id, { body, options });
+    _popups.set(popup_id, { body, options });
 
-    let marker = get_marker(id);
+    let marker = get_marker(marker_id);
     if (marker) {
         marker.unbindPopup();
         marker.bindPopup(body, {

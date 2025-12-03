@@ -1,9 +1,8 @@
 use std::error::Error;
 use dioxus::prelude::*;
 use dioxus_use_js::JsError;
-use serde::Serialize;
 
-use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, components::MapId, components::MarkerId};
+use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, types::Id};
 
 pub const DL_JS: Asset = asset!("/assets/dioxus_leaflet.js");
 
@@ -13,6 +12,7 @@ mod js_api {
 
     use_js!("js_utils/src/map.ts", "assets/dioxus_leaflet.js"::{update_map, delete_map});
     use_js!("js_utils/src/marker.ts", "assets/dioxus_leaflet.js"::{update_marker, delete_marker});
+    use_js!("js_utils/src/polygon.ts", "assets/dioxus_leaflet.js"::{update_polygon, delete_polygon});
     use_js!("js_utils/src/popup.ts", "assets/dioxus_leaflet.js"::{update_popup});
 }
 
@@ -23,13 +23,6 @@ while (!window.L || !window.DioxusLeaflet) {
 await window.DioxusLeaflet.registerOnClickHandlerMapAsync(() => dioxus.recv(), (x) => dioxus.send(x));
 "#;
 
-const CALL_POLYGON_JS: &str = r#"
-while (!window.L || !window.DioxusLeaflet) {
-    await new Promise(cb => setTimeout(cb, 100));
-}
-await window.DioxusLeaflet.updatePolygonAsync(() => dioxus.recv(), (x) => dioxus.send(x));
-"#;
-
 fn js_to_eval(err: JsError) -> Box<dyn Error + Send + Sync> {
     match err {
         JsError::Eval(err) => err.into(),
@@ -37,18 +30,18 @@ fn js_to_eval(err: JsError) -> Box<dyn Error + Send + Sync> {
     }
 }
 
-pub async fn update_map(
-    map_id: MapId, initial_position: &MapPosition, options: &MapOptions,
+pub async fn update_map<'a>(
+    id: &Id, initial_position: &MapPosition, options: &MapOptions,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::update_map(map_id, initial_position, options).await.map_err(js_to_eval)
+    js_api::update_map(id, initial_position, options).await.map_err(js_to_eval)
 }
 
-pub async fn delete_map(map_id: MapId) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::delete_map(map_id).await.map_err(js_to_eval)
+pub async fn delete_map<'a>(id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::delete_map(id).await.map_err(js_to_eval)
 }
 
-pub async fn register_onclick_handler_map(
-    map_id: MapId,
+pub async fn register_onclick_handler_map<'a>(
+    map_id: &Id,
     event_handler: Option<EventHandler<LatLng>>
 ) -> Result<(), String> {
     let mut eval = document::eval(CALL_REGISTER_ONCLICK_HANDLER_MAP_JS);
@@ -69,52 +62,33 @@ pub async fn register_onclick_handler_map(
 }
 
 pub async fn update_marker(
-    map_id: MapId, 
-    marker_id: MarkerId,
+    marker_id: &Id,
     coordinate: &LatLng,
     icon: &Option<MarkerIcon>,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::update_marker(map_id, marker_id, coordinate, icon).await.map_err(js_to_eval)
+    js_api::update_marker(marker_id.parent().unwrap(), marker_id.id(), coordinate, icon).await.map_err(js_to_eval)
 }
 
-pub async fn delete_marker(map_id: MapId, marker_id: MarkerId) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::delete_marker(map_id, marker_id).await.map_err(js_to_eval)
-}
-
-#[derive(Serialize)]
-struct PolygonProps<'a> {
-    pub map_id: usize,
-    pub polygon_id: usize,
-    pub coordinates: &'a Vec<LatLng>,
-    pub options: &'a PathOptions,
+pub async fn delete_marker(marker_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::delete_marker(marker_id.parent().unwrap(), marker_id.id()).await.map_err(js_to_eval)
 }
 
 pub async fn update_polygon(
-    map_id: usize,
-    polygon_id: usize,
-    coordinates: &Vec<LatLng>,
+    polygon_id: &Id,
+    coordinates: &Vec<Vec<Vec<LatLng>>>,
     options: &PathOptions,
-) -> Result<(), String> {
-    let mut eval = document::eval(CALL_POLYGON_JS);
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::update_polygon(polygon_id.parent().unwrap(), polygon_id.id(), coordinates, options).await.map_err(js_to_eval)
+}
 
-    eval.send(PolygonProps { map_id, polygon_id, coordinates, options })
-        .map_err(|e| e.to_string())?;
-
-    let ret = eval.recv::<Option<String>>().await
-        .map_err(|e| e.to_string())?;
-
-    if let Some(e) = ret {
-        Err(e)
-    }
-    else {
-        Ok(())
-    }
+pub async fn delete_polygon(polygon_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::delete_polygon(polygon_id.parent().unwrap(), polygon_id.id()).await.map_err(js_to_eval)
 }
 
 pub async fn update_popup(
-    marker_id: MarkerId,
-    body_id: usize,
+    popup_id: &Id,
     options: &PopupOptions,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::update_popup(marker_id.into(), body_id as f64, options).await.map_err(js_to_eval)
+    let marker_id = popup_id.parent().unwrap();
+    js_api::update_popup(marker_id, popup_id, options).await.map_err(js_to_eval)
 }

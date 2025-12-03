@@ -33,7 +33,7 @@ fn App() -> Element {
                 }
             }
             Polygon {
-                coordinates: Vec::from(&jersey::JERSEY_BORDER),
+                coordinates: vec![vec![Vec::from(&jersey::JERSEY_BORDER)]],
                 options: PathOptions {
                     color: Color::new([1., 1., 0.]),
                     fill: true,
