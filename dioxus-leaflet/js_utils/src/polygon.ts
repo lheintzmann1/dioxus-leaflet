@@ -1,8 +1,13 @@
 import { setup } from "./util";
 import { get_map } from "./map";
 import type { L, Id, Json } from "./types";
+import { get_popup } from "./popup";
 
 const _gons = new Map<Id, L.Polygon>();
+
+export function get_polygon(polygon_id: Id): L.Polygon | undefined {
+    return _gons.get(polygon_id);
+}
 
 export async function update_polygon(map_id: Id, polygon_id: Id, coordinates: L.LatLngLiteral[][][], options: L.PathOptions) {
     const l = await setup();
@@ -17,11 +22,11 @@ export async function update_polygon(map_id: Id, polygon_id: Id, coordinates: L.
     gon.setLatLngs(coordinates);
     gon.setStyle(options);
 
-    // const popup = this._popups.get(polygon_id);
-    // if (popup) {
-    //     gon.unbindPopup();
-    //     gon.bindPopup(popup.body, popup.options);
-    // }
+    const popup = get_popup(polygon_id);
+    if (popup) {
+        gon.unbindPopup();
+        gon.bindPopup(popup.body, popup.options);
+    }
 }
 
 export async function delete_polygon(map_id: Id, polygon_id: Id) {

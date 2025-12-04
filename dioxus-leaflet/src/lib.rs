@@ -82,7 +82,7 @@
 //!     }
 //! }
 //! ```
-
+// #![feature(hint_must_use)]
 mod components;
 mod types;
 mod interop;

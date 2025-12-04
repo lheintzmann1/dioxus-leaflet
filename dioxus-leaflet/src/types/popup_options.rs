@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// Popup configuration options
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PopupOptions {
     pub max_width: Option<u32>,
     pub min_width: Option<u32>,

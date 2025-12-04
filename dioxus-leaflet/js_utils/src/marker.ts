@@ -1,6 +1,7 @@
-import type { L, Id, MarkerIcon } from "./types";
+import type { L, Id } from "./types";
 import { get_map } from "./map";
 import { setup } from "./util";
+import { get_popup } from "./popup";
 
 const _markers = new Map<Id, L.Marker>();
 
@@ -8,7 +9,7 @@ export function get_marker(marker_id: Id): L.Marker | undefined {
     return _markers.get(marker_id);
 }
 
-export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.LatLngExpression, icon?: MarkerIcon) {
+export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.LatLngExpression, icon?: L.IconOptions) {
     const l = await setup();
     const map = get_map(map_id);
     if (!map) {
@@ -20,21 +21,14 @@ export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.Lat
 
     marker.setLatLng(coordinate);
     if (icon) {
-        marker.setIcon(l.icon({
-            iconUrl: icon.icon_url,
-            iconSize: icon.icon_size,
-            iconAnchor: icon.icon_anchor,
-            popupAnchor: icon.popup_anchor,
-            shadowUrl: icon.shadow_url,
-            shadowSize: icon.shadow_size,
-        }));
+        marker.setIcon(l.icon(icon));
     }
 
-    // const popup = this._popups.get(marker_id);
-    // if (popup) {
-    //     marker.unbindPopup();
-    //     marker.bindPopup(popup.body, popup.options);
-    // }
+    const popup = get_popup(marker_id);
+    if (popup) {
+        marker.unbindPopup();
+        marker.bindPopup(popup.body, popup.options);
+    }
 }
 
 export async function delete_marker(map_id: Id, marker_id: Id) {

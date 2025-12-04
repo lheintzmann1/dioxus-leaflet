@@ -1,34 +1,31 @@
-import { Id, PopupOptions } from "./types";
+import { L, Id } from "./types";
 import { get_marker } from "./marker";
+import { get_polygon } from "./polygon";
+import { setup } from "./util";
 
 type PopupRecord = {
     body: HTMLElement,
-    options: PopupOptions,
+    options: L.PopupOptions,
 };
 
 const _popups = new Map<Id, PopupRecord>();
 
-export async function update_popup(marker_id: Id, popup_id: Id, options: PopupOptions) {
+export function get_popup(marker_id: Id): PopupRecord | undefined {
+    return _popups.get(marker_id);
+}
+
+export async function update_popup(marker_id: Id, popup_id: Id, options: L.PopupOptions) {
+    const l = await setup();
     const id = `dioxus-leaflet-popup-${popup_id}`;
     const body = document.getElementById(id);
     if (!body) {
         throw new Error(`Popup body element with id ${id} not found when updating popup for object ${marker_id}`);
     }
-    _popups.set(popup_id, { body, options });
+    _popups.set(marker_id, { body, options });
 
-    let marker = get_marker(marker_id);
-    if (marker) {
-        marker.unbindPopup();
-        marker.bindPopup(body, {
-            maxWidth: options.max_width,
-            minWidth: options.min_width,
-            maxHeight: options.max_height,
-            autoPan: options.auto_pan,
-            keepInView: options.keep_in_view,
-            closeButton: options.close_button,
-            autoClose: options.auto_close,
-            closeOnEscapeKey: options.close_on_escape_key,
-            className: options.class_name,
-        });
+    let context = get_marker(marker_id) ?? get_polygon(marker_id);
+    if (context) {
+        context.unbindPopup();
+        context.bindPopup(body, options);
     }
 }

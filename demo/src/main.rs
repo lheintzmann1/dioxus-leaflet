@@ -18,6 +18,7 @@ fn App() -> Element {
         Map {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
             on_click: move |pos: LatLng| {
+                info!("Map clicked at: {:?}", pos);
                 if let Some(marker) = markers.write().last_mut() {
                     marker.2 = pos;
                 }
