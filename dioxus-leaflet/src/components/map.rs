@@ -44,8 +44,6 @@ pub fn Map(
     let leaflet_css = options.leaflet_resources.css_url();
     let leaflet_js = options.leaflet_resources.js_url();
 
-    let test_signal = use_signal(|| false);
-
     let id2 = id.clone();
     use_effect(move || {
         let id = id2.clone();
@@ -56,7 +54,7 @@ pub fn Map(
                 load_error.set(Some(e.to_string()));
             }
             if let Some(cb) = on_click {
-                if let Err(e) = interop::on_map_click(WriteSignal::new(test_signal), &id, cb).await {
+                if let Err(e) = interop::on_map_click(&id, cb).await {
                     load_error.set(Some(e.to_string()));
                 }
             }
@@ -85,9 +83,6 @@ pub fn Map(
         // boot logic
         document::Script { src: interop::DL_JS }
 
-        p {
-            "{test_signal()}"
-        }
         if let Some(err) = load_error() {
             p {
                 "{err}"

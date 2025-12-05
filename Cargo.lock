@@ -979,9 +979,9 @@ dependencies = [
 
 [[package]]
 name = "dioxus-use-js"
-version = "0.2.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fe5430e42cb8c3e5891a520469bb7e125ba73d008f692fac7eeaad631e4ad52"
+checksum = "ad000a9f5d2ff544a359694e4d444406f0a44931c0ea9fd5602d8701ffc30c19"
 dependencies = [
  "bon",
  "dioxus",
@@ -992,9 +992,9 @@ dependencies = [
 
 [[package]]
 name = "dioxus-use-js-macro"
-version = "0.2.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04bcda699e7bce27e507d30fa867bde764c408ee32b6b3d7cc4bf919a01c2a94"
+checksum = "c16fe32e9eb75ca209827be7693ecb62291dc8ba69f43bb34476bfe6dbb3594a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2775,7 +2775,6 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.52.0",
  "windows-sys 0.59.0",
 ]
 
