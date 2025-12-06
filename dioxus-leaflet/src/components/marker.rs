@@ -1,13 +1,12 @@
 use dioxus::{core::use_drop, prelude::*};
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 use dioxus_logger::tracing::error;
 
 use crate::{
-    components::map::MapContext, 
-    components::popup::PopupContext,
     LatLng, 
     MarkerIcon, 
     interop,
+    types::Id,
 };
 
 #[component]
@@ -24,27 +23,29 @@ pub fn Marker(
 
     children: Option<Element>,
 ) -> Element {
-    let map: MapContext = use_context();
-    let context = use_context_provider(|| PopupContext(dioxus_core::current_scope_id().0));
+    let map: Rc<Id> = use_context();
+    let id = use_context_provider(|| Rc::new(Id::marker(&map, dioxus_core::current_scope_id().0)));
 
+    let id2 = id.clone();
     use_effect(move || {
+        let id = id2.clone();
         let coord = coordinate();
         let icon = icon();
         spawn(async move {
-            if let Err(e) = interop::update_marker(map.0, context.0, &coord, &icon).await {
+            if let Err(e) = interop::update_marker(&id, &coord, &icon).await {
                 error!("Error rendering marker: {e}");
             }
         });
     });
 
+    let id2 = id.clone();
     use_drop(move || {
-        let marker_id = interop::MarkerId{
-            map_id: map.0,
-            marker_id: context.0
-        };
-        if let Err(e) = interop::delete_marker(marker_id) {
-            error!("Error deleting marker: {e}");
-        }
+        let id = id2.clone();
+        spawn(async move {
+            if let Err(e) = interop::delete_marker(&id).await {
+                error!("Error deleting marker: {e}");
+            }
+        });
     });
 
     rsx!({children})

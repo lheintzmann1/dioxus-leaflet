@@ -21,3 +21,6 @@ pub use path_options::{Color, LineCap, LineJoin, PathOptions};
 
 mod latlng;
 pub use latlng::LatLng;
+
+mod id;
+pub use id::*;

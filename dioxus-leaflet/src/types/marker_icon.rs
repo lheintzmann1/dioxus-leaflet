@@ -2,6 +2,7 @@ use serde::{Serialize, Deserialize};
 
 /// Custom marker icon configuration
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MarkerIcon {
     pub icon_url: String,
     pub icon_size: Option<(u32, u32)>,

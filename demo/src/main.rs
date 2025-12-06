@@ -18,6 +18,7 @@ fn App() -> Element {
         Map {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
             on_click: move |pos: LatLng| {
+                info!("Map clicked at: {:?}", pos);
                 if let Some(marker) = markers.write().last_mut() {
                     marker.2 = pos;
                 }
@@ -33,7 +34,7 @@ fn App() -> Element {
                 }
             }
             Polygon {
-                coordinates: Vec::from(&jersey::JERSEY_BORDER),
+                coordinates: vec![vec![Vec::from(&jersey::JERSEY_BORDER)]],
                 options: PathOptions {
                     color: Color::new([1., 1., 0.]),
                     fill: true,
