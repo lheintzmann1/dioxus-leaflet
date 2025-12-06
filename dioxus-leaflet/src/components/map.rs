@@ -54,9 +54,7 @@ pub fn Map(
                 load_error.set(Some(e.to_string()));
             }
             if let Some(cb) = on_click {
-                if let Err(e) = interop::on_map_click(&id, cb).await {
-                    load_error.set(Some(e.to_string()));
-                }
+                interop::on_map_click(&id, cb);
             }
         });
     });

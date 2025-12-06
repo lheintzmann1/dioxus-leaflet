@@ -48,13 +48,11 @@ export async function on_map_click(map_id: Id, callback: RustCallback<number[], 
     }
 
     map.on("click", async (e: L.LeafletMouseEvent) => {
-        console.log("js-pre");
         try {
             await callback([e.latlng.lat, e.latlng.lng]);
         } catch (error) {
             console.error("Error in on_map_click callback:", error);
         }
-        console.log("js-post");
     });
 
     // once this method returns, the callback is no longer valid

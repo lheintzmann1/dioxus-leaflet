@@ -1,5 +1,5 @@
 use std::error::Error;
-use dioxus::prelude::*;
+use dioxus::{prelude::*, logger::tracing::error};
 use dioxus_use_js::JsError;
 
 use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, types::Id};
@@ -33,14 +33,22 @@ pub async fn delete_map<'a>(id: &Id) -> Result<(), Box<dyn Error + Send + Sync>>
     js_api::delete_map(id).await.map_err(js_to_eval)
 }
 
-pub async fn on_map_click(
+pub fn on_map_click(
     map_id: &Id,
     event_handler: EventHandler<LatLng>,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::on_map_click(map_id, async |coords| {
-        event_handler(LatLng::new(coords[0], coords[1]));
-        Ok(())
-    }).await.map_err(|e| e.into())
+) -> () {
+    let map_id = map_id.clone();
+    spawn(async move {
+        let r = js_api::on_map_click(map_id, async |coords| {
+            event_handler(LatLng::new(coords[0], coords[1]));
+            Ok(())
+        }).await;
+
+        if let Err(e) = r {
+            error!("Error in on_map_click: {}", e);
+        }
+    });
+    
 }
 
 pub async fn update_marker(
