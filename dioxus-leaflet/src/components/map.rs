@@ -1,6 +1,6 @@
+use crate::{LatLng, MapOptions, MapPosition, interop, types::Id};
 use dioxus::{core::use_drop, prelude::*};
 use std::rc::Rc;
-use crate::{LatLng, MapOptions, MapPosition, interop, types::Id};
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
 
@@ -10,29 +10,29 @@ pub fn Map(
     /// Initial position of the map
     #[props(default = MapPosition::default())]
     initial_position: MapPosition,
-    
+
     /// Height of the map container
     #[props(into)]
     height: Option<String>,
-    
+
     /// Width of the map container
     #[props(into)]
     width: Option<String>,
-    
+
     /// Map configuration options
     options: Option<MapOptions>,
-    
+
     /// Custom CSS class for the map container
     #[props(into)]
     class: Option<String>,
-    
+
     /// Custom CSS styles for the map container
     #[props(into)]
     style: Option<String>,
-    
+
     /// Callback when map is clicked
     on_click: Option<EventHandler<LatLng>>,
-    
+
     /// Callback when map is moved
     on_move: Option<EventHandler<MapPosition>>,
 
@@ -60,7 +60,7 @@ pub fn Map(
     });
 
     let id2 = id.clone();
-    use_drop(move || { 
+    use_drop(move || {
         let id = id2.clone();
         spawn(async move {
             if let Err(e) = interop::delete_map(&id).await {
@@ -74,10 +74,10 @@ pub fn Map(
         document::Style { href: leaflet_css }
 
         document::Style { href: MAP_CSS }
-        
+
         // Leaflet JavaScript
         document::Script { src: leaflet_js }
-        
+
         // boot logic
         document::Script { src: interop::DL_JS }
 

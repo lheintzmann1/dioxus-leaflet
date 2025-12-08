@@ -1,12 +1,11 @@
+use crate::{PopupOptions, interop, types::Id};
 use dioxus::prelude::*;
 use dioxus_logger::tracing::error;
 use std::rc::Rc;
-use crate::{interop, PopupOptions, types::Id};
 
 #[component]
 pub fn Popup(
-    #[props(default = PopupOptions::default())]
-    options: PopupOptions,
+    #[props(default = PopupOptions::default())] options: PopupOptions,
 
     children: Element,
 ) -> Element {
@@ -33,4 +32,3 @@ pub fn Popup(
         }
     )
 }
-

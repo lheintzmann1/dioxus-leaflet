@@ -1,23 +1,16 @@
 use dioxus::{core::use_drop, prelude::*};
-use std::{collections::HashMap, rc::Rc};
 use dioxus_logger::tracing::error;
+use std::{collections::HashMap, rc::Rc};
 
-use crate::{
-    LatLng, 
-    MarkerIcon, 
-    interop,
-    types::Id,
-};
+use crate::{LatLng, MarkerIcon, interop, types::Id};
 
 #[component]
 pub fn Marker(
     coordinate: ReadSignal<LatLng>,
 
-    #[props(default = None)]
-    icon: ReadSignal<Option<MarkerIcon>>,
+    #[props(default = None)] icon: ReadSignal<Option<MarkerIcon>>,
 
-    #[props(default = None)]
-    custom_data: ReadSignal<Option<HashMap<String, String>>>,
+    #[props(default = None)] custom_data: ReadSignal<Option<HashMap<String, String>>>,
 
     on_click: Option<EventHandler>,
 
@@ -48,5 +41,5 @@ pub fn Marker(
         });
     });
 
-    rsx!({children})
+    rsx!({ children })
 }

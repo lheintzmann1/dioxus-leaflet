@@ -1,6 +1,6 @@
-use std::error::Error;
-use dioxus::{prelude::*, logger::tracing::error};
+use dioxus::{logger::tracing::error, prelude::*};
 use dioxus_use_js::JsError;
+use std::error::Error;
 
 use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, types::Id};
 
@@ -24,31 +24,32 @@ fn js_to_eval(err: JsError) -> Box<dyn Error + Send + Sync> {
 }
 
 pub async fn update_map<'a>(
-    id: &Id, initial_position: &MapPosition, options: &MapOptions,
+    id: &Id,
+    initial_position: &MapPosition,
+    options: &MapOptions,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::update_map(id, initial_position, options).await.map_err(js_to_eval)
+    js_api::update_map(id, initial_position, options)
+        .await
+        .map_err(js_to_eval)
 }
 
 pub async fn delete_map<'a>(id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
     js_api::delete_map(id).await.map_err(js_to_eval)
 }
 
-pub fn on_map_click(
-    map_id: &Id,
-    event_handler: EventHandler<LatLng>,
-) -> () {
+pub fn on_map_click(map_id: &Id, event_handler: EventHandler<LatLng>) -> () {
     let map_id = map_id.clone();
     spawn(async move {
         let r = js_api::on_map_click(map_id, async |coords| {
             event_handler(LatLng::new(coords[0], coords[1]));
             Ok(())
-        }).await;
+        })
+        .await;
 
         if let Err(e) = r {
             error!("Error in on_map_click: {}", e);
         }
     });
-    
 }
 
 pub async fn update_marker(
@@ -56,11 +57,20 @@ pub async fn update_marker(
     coordinate: &LatLng,
     icon: &Option<MarkerIcon>,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::update_marker(marker_id.parent().unwrap(), marker_id.id(), coordinate, icon).await.map_err(js_to_eval)
+    js_api::update_marker(
+        marker_id.parent().unwrap(),
+        marker_id.id(),
+        coordinate,
+        icon,
+    )
+    .await
+    .map_err(js_to_eval)
 }
 
 pub async fn delete_marker(marker_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::delete_marker(marker_id.parent().unwrap(), marker_id.id()).await.map_err(js_to_eval)
+    js_api::delete_marker(marker_id.parent().unwrap(), marker_id.id())
+        .await
+        .map_err(js_to_eval)
 }
 
 pub async fn update_polygon(
@@ -68,11 +78,20 @@ pub async fn update_polygon(
     coordinates: &Vec<Vec<Vec<LatLng>>>,
     options: &PathOptions,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::update_polygon(polygon_id.parent().unwrap(), polygon_id.id(), coordinates, options).await.map_err(js_to_eval)
+    js_api::update_polygon(
+        polygon_id.parent().unwrap(),
+        polygon_id.id(),
+        coordinates,
+        options,
+    )
+    .await
+    .map_err(js_to_eval)
 }
 
 pub async fn delete_polygon(polygon_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
-    js_api::delete_polygon(polygon_id.parent().unwrap(), polygon_id.id()).await.map_err(js_to_eval)
+    js_api::delete_polygon(polygon_id.parent().unwrap(), polygon_id.id())
+        .await
+        .map_err(js_to_eval)
 }
 
 pub async fn update_popup(
@@ -80,5 +99,7 @@ pub async fn update_popup(
     options: &PopupOptions,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let marker_id = popup_id.parent().unwrap();
-    js_api::update_popup(marker_id, popup_id, options).await.map_err(js_to_eval)
+    js_api::update_popup(marker_id, popup_id, options)
+        .await
+        .map_err(js_to_eval)
 }

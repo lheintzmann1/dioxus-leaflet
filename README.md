@@ -37,8 +37,8 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-leaflet = "0.2.0"
-dioxus = "0.7.0-rc.0"
+dioxus-leaflet = "0.3.0"
+dioxus = "0.7.0-rc.2"
 ```
 
 ## Quick Start

@@ -2,14 +2,13 @@ use dioxus::{core::use_drop, prelude::*};
 use dioxus_logger::tracing::error;
 use std::rc::Rc;
 
-use crate::{interop, LatLng, PathOptions, types::Id};
+use crate::{LatLng, PathOptions, interop, types::Id};
 
 #[component]
 pub fn Polygon(
     coordinates: ReadSignal<Vec<Vec<Vec<LatLng>>>>,
 
-    #[props(default = PathOptions::default())]
-    options: ReadSignal<PathOptions>,
+    #[props(default = PathOptions::default())] options: ReadSignal<PathOptions>,
 
     children: Option<Element>,
 ) -> Element {
@@ -38,5 +37,5 @@ pub fn Polygon(
         });
     });
 
-    rsx!({children})
+    rsx!({ children })
 }
