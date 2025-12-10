@@ -11,7 +11,7 @@ export function get_polygon(polygon_id: Id): L.Polygon | undefined {
 
 export async function update_polygon(map_id: Id, polygon_id: Id, coordinates: L.LatLngLiteral[][][], options: L.PathOptions) {
     const l = await setup();
-    const map = get_map(map_id);
+    const map = await get_map(map_id);
     if (!map) {
         throw new Error(`Map with id ${map_id} not found when updating polygon ${polygon_id}`);
     }
@@ -31,7 +31,7 @@ export async function update_polygon(map_id: Id, polygon_id: Id, coordinates: L.
 
 export async function delete_polygon(map_id: Id, polygon_id: Id) {
     const l = await setup();
-    const map = get_map(map_id);
+    const map = await get_map(map_id);
     if (!map) {
         throw new Error(`Map with id ${map_id} not found when deleting polygon ${polygon_id}`);
     }

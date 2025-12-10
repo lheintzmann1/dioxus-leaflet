@@ -1,5 +1,5 @@
 use dioxus::{logger::tracing::error, prelude::*};
-use dioxus_use_js::JsError;
+use dioxus_use_js::{JsError, SerdeJsonValue};
 use std::error::Error;
 
 use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, types::Id};
@@ -18,8 +18,8 @@ mod js_api {
 
 fn js_to_eval(err: JsError) -> Box<dyn Error + Send + Sync> {
     match err {
-        JsError::Eval(err) => err.into(),
-        _ => panic!("Unexpected JsError variant"),
+        JsError::Eval { error, .. } => error.into(),
+        JsError::Threw { func, .. } => Box::<dyn Error + Send + Sync>::from(func),
     }
 }
 
@@ -37,19 +37,12 @@ pub async fn delete_map<'a>(id: &Id) -> Result<(), Box<dyn Error + Send + Sync>>
     js_api::delete_map(id).await.map_err(js_to_eval)
 }
 
-pub fn on_map_click(map_id: &Id, event_handler: EventHandler<LatLng>) -> () {
-    let map_id = map_id.clone();
-    spawn(async move {
-        let r = js_api::on_map_click(map_id, async |coords| {
-            event_handler(LatLng::new(coords[0], coords[1]));
-            Ok(())
-        })
-        .await;
-
-        if let Err(e) = r {
-            error!("Error in on_map_click: {}", e);
-        }
+pub async fn on_map_click(map_id: &Id, callback: EventHandler<LatLng>) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let mapper_cb = Callback::new(move |coords: Vec<f64>| async move {
+        callback.call(LatLng::new(coords[0], coords[1]));
+        Result::<(), SerdeJsonValue>::Ok(())
     });
+    js_api::on_map_click(map_id, mapper_cb).await.map_err(js_to_eval)
 }
 
 pub async fn update_marker(
