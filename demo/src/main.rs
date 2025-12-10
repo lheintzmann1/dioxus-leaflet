@@ -23,6 +23,9 @@ fn App() -> Element {
                     marker.2 = pos;
                 }
             },
+            on_move: move |pos: MapPosition| {
+                info!("Map moved to: {:?}", pos);
+            },
             for marker in markers() {
                 Marker {
                     coordinate: marker.2,

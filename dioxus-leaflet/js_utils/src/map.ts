@@ -77,3 +77,21 @@ export async function on_map_click(map_id: Id, callback: RustCallback<number[], 
         }
     });
 }
+
+export async function on_map_move(map_id: Id, callback: RustCallback<number[], void>): Promise<void> {
+    await setup();
+    const map = await get_map(map_id);
+    if (!map) {
+        throw new Error(`Map with id ${map_id} not found when setting onMove handler`);
+    }
+
+    map.on("move", async () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        try {
+            await callback([center.lat, center.lng, zoom]);
+        } catch (error) {
+            console.error("Error in map_on_move callback:", error);
+        }
+    });
+}

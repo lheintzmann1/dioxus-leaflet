@@ -54,11 +54,24 @@ pub fn Map(
     });
 
     let id2 = id.clone();
-    let _handle = use_resource(move || {
+    let _click_handle = use_resource(move || {
         let id = id2.clone();
         async move {
             if let Some(on_click) = on_click {
                 interop::on_map_click(&id, on_click).await
+            }
+            else {
+                Ok(())
+            }
+        }
+    });
+
+    let id2 = id.clone();
+    let _move_handle = use_resource(move || {
+        let id = id2.clone();
+        async move {
+            if let Some(on_move) = on_move {
+                interop::on_map_move(&id, on_move).await
             }
             else {
                 Ok(())
