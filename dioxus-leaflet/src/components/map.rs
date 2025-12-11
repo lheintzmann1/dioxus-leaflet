@@ -39,33 +39,51 @@ pub fn Map(
     children: Option<Element>,
 ) -> Element {
     let id = use_context_provider(|| Rc::new(Id::map(dioxus_core::current_scope_id().0)));
-    let mut load_error: Signal<Option<String>> = use_signal(|| None);
     let options = options.unwrap_or(MapOptions::default());
     let leaflet_css = options.leaflet_resources.css_url();
     let leaflet_js = options.leaflet_resources.js_url();
 
     let id2 = id.clone();
-    use_effect(move || {
+    let load_error = use_resource(move || {
         let id = id2.clone();
         let pos = initial_position.clone();
         let opts = options.clone();
-        spawn(async move {
-            if let Err(e) = interop::update_map(&id, &pos, &opts).await {
-                load_error.set(Some(e.to_string()));
+        async move {
+            interop::update_map(&id, &pos, &opts).await.map_err(|e| e.to_string())
+        }
+    });
+
+    let id2 = id.clone();
+    let _click_handle = use_resource(move || {
+        let id = id2.clone();
+        async move {
+            if let Some(on_click) = on_click {
+                interop::on_map_click(&id, on_click).await
             }
-            if let Some(cb) = on_click {
-                interop::on_map_click(&id, cb);
+            else {
+                Ok(())
             }
-        });
+        }
+    });
+
+    let id2 = id.clone();
+    let _move_handle = use_resource(move || {
+        let id = id2.clone();
+        async move {
+            if let Some(on_move) = on_move {
+                interop::on_map_move(&id, on_move).await
+            }
+            else {
+                Ok(())
+            }
+        }
     });
 
     let id2 = id.clone();
     use_drop(move || {
         let id = id2.clone();
         spawn(async move {
-            if let Err(e) = interop::delete_map(&id).await {
-                load_error.set(Some(e.to_string()));
-            }
+            _ = interop::delete_map(&id).await;
         });
     });
 
@@ -81,7 +99,7 @@ pub fn Map(
         // boot logic
         document::Script { src: interop::DL_JS }
 
-        if let Some(err) = load_error() {
+        if let Some(Err(err)) = load_error() {
             p {
                 "{err}"
             }

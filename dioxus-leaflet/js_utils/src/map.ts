@@ -2,9 +2,22 @@ import type { L, Id, MapOptions, MapPosition, RustCallback, Json } from "./types
 import { setup, wait } from "./util";
 
 const _maps = new Map<Id, L.Map>();
+const _callbacks = new Map<Id, (map: L.Map) => void>();
+const _promises = new Map<Id, Promise<L.Map>>();
 
-export function get_map(map_id: Id): L.Map | undefined {
-    return _maps.get(map_id);
+export async function get_map(map_id: Id): Promise<L.Map> {
+    let map = _maps.get(map_id);
+    if (!map) {
+        let p = _promises.get(map_id);
+        if (!p) {
+            p = new Promise<L.Map>((resolve) => {
+                _callbacks.set(map_id, resolve);
+            });
+            _promises.set(map_id, p);
+        }
+        map = await p;
+    }
+    return map;
 }
 
 export async function update_map(map_id: Id, initial_position: MapPosition, options: MapOptions): Promise<void> {
@@ -20,7 +33,6 @@ export async function update_map(map_id: Id, initial_position: MapPosition, opti
         keyboard: options.keyboard,
         attributionControl: options.attribution_control
     });
-    _maps.set(map_id, map);
 
     map.setView(initial_position.coordinates, initial_position.zoom);
 
@@ -30,6 +42,16 @@ export async function update_map(map_id: Id, initial_position: MapPosition, opti
         maxZoom: options.tile_layer.max_zoom,
         subdomains: options.tile_layer.subdomains
     }).addTo(map);
+
+    _maps.set(map_id, map);
+
+    // Resolve any pending promises
+    if (_callbacks.has(map_id)) {
+        const callback = _callbacks.get(map_id)!;
+        callback(map);
+        _callbacks.delete(map_id);
+        _promises.delete(map_id);
+    }
 
     // Force resize to ensure proper display
     await wait(100);
@@ -42,7 +64,7 @@ export function delete_map(map_id: Id) {
 
 export async function on_map_click(map_id: Id, callback: RustCallback<number[], void>): Promise<void> {
     await setup();
-    const map = get_map(map_id);
+    const map = await get_map(map_id);
     if (!map) {
         throw new Error(`Map with id ${map_id} not found when setting onClick handler`);
     }
@@ -54,8 +76,22 @@ export async function on_map_click(map_id: Id, callback: RustCallback<number[], 
             console.error("Error in on_map_click callback:", error);
         }
     });
+}
 
-    // once this method returns, the callback is no longer valid
-    // TODO: unregister?
-    await new Promise<void>(() => {});
+export async function on_map_move(map_id: Id, callback: RustCallback<number[], void>): Promise<void> {
+    await setup();
+    const map = await get_map(map_id);
+    if (!map) {
+        throw new Error(`Map with id ${map_id} not found when setting onMove handler`);
+    }
+
+    map.on("move", async () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        try {
+            await callback([center.lat, center.lng, zoom]);
+        } catch (error) {
+            console.error("Error in map_on_move callback:", error);
+        }
+    });
 }

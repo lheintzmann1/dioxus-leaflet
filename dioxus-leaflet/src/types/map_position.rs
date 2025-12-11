@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use crate::LatLng;
 
 /// Represents a geographical position with zoom level
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapPosition {
     pub coordinates: LatLng,
     pub zoom: f64,

@@ -11,7 +11,7 @@ export function get_marker(marker_id: Id): L.Marker | undefined {
 
 export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.LatLngExpression, icon?: L.IconOptions) {
     const l = await setup();
-    const map = get_map(map_id);
+    const map = await get_map(map_id);
     if (!map) {
         throw new Error(`Map with id ${map_id} not found when updating marker ${marker_id}`);
     }
@@ -33,7 +33,7 @@ export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.Lat
 
 export async function delete_marker(map_id: Id, marker_id: Id) {
     const l = await setup();
-    const map = get_map(map_id);
+    const map = await get_map(map_id);
     if (!map) {
         throw new Error(`Map with id ${map_id} not found when deleting marker ${marker_id}`);
     }
