@@ -10,7 +10,7 @@ pub fn Polygon(
 
     #[props(default = PathOptions::default())] options: ReadSignal<PathOptions>,
 
-    children: Option<Element>,
+    children: Element,
 ) -> Element {
     let id: Rc<Id> = use_context();
     let id = use_context_provider(|| Rc::new(Id::polygon(&id, dioxus_core::current_scope_id().0)));

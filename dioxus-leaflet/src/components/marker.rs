@@ -14,7 +14,7 @@ pub fn Marker(
 
     on_click: Option<EventHandler>,
 
-    children: Option<Element>,
+    children: Element,
 ) -> Element {
     let map: Rc<Id> = use_context();
     let id = use_context_provider(|| Rc::new(Id::marker(&map, dioxus_core::current_scope_id().0)));
