@@ -1,5 +1,5 @@
 use crate::{LatLng, MapOptions, MapPosition, interop, types::Id};
-use dioxus::{core::use_drop, prelude::*};
+use dioxus::{core::{use_drop, spawn_forever}, prelude::*};
 use std::rc::Rc;
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
@@ -82,7 +82,7 @@ pub fn Map(
     let id2 = id.clone();
     use_drop(move || {
         let id = id2.clone();
-        spawn(async move {
+        spawn_forever(async move {
             _ = interop::delete_map(&id).await;
         });
     });

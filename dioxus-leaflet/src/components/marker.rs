@@ -1,4 +1,4 @@
-use dioxus::{core::use_drop, prelude::*};
+use dioxus::{core::{use_drop, spawn_forever}, prelude::*};
 use dioxus_logger::tracing::error;
 use std::{collections::HashMap, rc::Rc};
 
@@ -34,7 +34,7 @@ pub fn Marker(
     let id2 = id.clone();
     use_drop(move || {
         let id = id2.clone();
-        spawn(async move {
+        spawn_forever(async move {
             if let Err(e) = interop::delete_marker(&id).await {
                 error!("Error deleting marker: {e}");
             }
