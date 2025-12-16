@@ -1,4 +1,4 @@
-use dioxus::{core::use_drop, prelude::*};
+use dioxus::{core::{use_drop, spawn_forever}, prelude::*};
 use dioxus_logger::tracing::error;
 use std::{collections::HashMap, rc::Rc};
 
@@ -14,7 +14,7 @@ pub fn Marker(
 
     on_click: Option<EventHandler>,
 
-    children: Option<Element>,
+    children: Element,
 ) -> Element {
     let map: Rc<Id> = use_context();
     let id = use_context_provider(|| Rc::new(Id::marker(&map, dioxus_core::current_scope_id().0)));
@@ -34,7 +34,7 @@ pub fn Marker(
     let id2 = id.clone();
     use_drop(move || {
         let id = id2.clone();
-        spawn(async move {
+        spawn_forever(async move {
             if let Err(e) = interop::delete_marker(&id).await {
                 error!("Error deleting marker: {e}");
             }

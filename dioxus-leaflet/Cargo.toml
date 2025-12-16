@@ -17,12 +17,12 @@ dioxus = { workspace = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 fastrand = "2.0"
-dioxus-logger = "0.7.0-rc.2"
+dioxus-logger = "0.7.2"
 color = { version = "0.3.2", features = ["serde"] }
-dioxus-use-js = "0.4.2"
+dioxus-use-js = "0.4.6"
 
 [build-dependencies]
-dioxus-use-js = { version = "0.4.2", features = ["build"] }
+dioxus-use-js = { version = "0.4.6", features = ["build"] }
 
 [features]
 default = []

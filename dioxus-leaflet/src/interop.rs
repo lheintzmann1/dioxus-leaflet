@@ -1,4 +1,4 @@
-use dioxus::{logger::tracing::error, prelude::*};
+use dioxus::prelude::*;
 use dioxus_use_js::{JsError, SerdeJsonValue};
 use std::error::Error;
 
