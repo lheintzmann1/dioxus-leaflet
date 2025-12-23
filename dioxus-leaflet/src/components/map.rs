@@ -97,7 +97,7 @@ pub fn Map(
         document::Script { src: leaflet_js }
 
         // boot logic
-        document::Script { src: interop::DL_JS }
+        document::Script { src: interop::DL_JS, type: "module" }
 
         if let Some(Err(err)) = load_error() {
             p {
