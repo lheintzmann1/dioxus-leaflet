@@ -42,11 +42,15 @@ pub fn Map(
     let options = options.unwrap_or(MapOptions::default());
     let leaflet_css = options.leaflet_resources.css_url();
     let leaflet_js = options.leaflet_resources.js_url();
+    let height = height.unwrap_or_else(|| "400px".to_string());
+    let width = width.unwrap_or_else(|| "100%".to_string());
+    let style = style.unwrap_or_default();
+    let class = class.unwrap_or_default();
 
     let id2 = id.clone();
     let load_error = use_resource(move || {
         let id = id2.clone();
-        let pos = initial_position.clone();
+        let pos = initial_position;
         let opts = options.clone();
         async move {
             interop::update_map(&id, &pos, &opts).await.map_err(|e| e.to_string())
@@ -97,21 +101,19 @@ pub fn Map(
         document::Script { src: leaflet_js }
 
         // boot logic
-        document::Script { src: interop::DL_JS, type: "module" }
+        document::Script { src: interop::DL_JS, r#type: "module" }
 
         if let Some(Err(err)) = load_error() {
-            p {
-                "{err}"
-            }
-        }
-        else {
-            // Map container
+            p { "{err}" }
+        } else {
+            // Keep size/style on the wrapping container so Leaflet can mount reliably.
             div {
-                class: "dioxus-leaflet-container {class.as_ref().map(|c| c.as_str()).unwrap_or(\"\")}",
+                class: "dioxus-leaflet-container {class}",
+                style: "height: {height}; width: {width}; {style}",
 
                 // Element taken over by leaflet
                 div {
-                    id: "dioxus-leaflet-{id}",
+                    id: "dioxus-leaflet-map-{id.id()}",
                     class: "dioxus-leaflet-map",
                     {children}
                 }
