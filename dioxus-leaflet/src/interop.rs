@@ -13,6 +13,7 @@ mod js_api {
     use_js!("js_utils/src/map.ts", "assets/dioxus_leaflet.js"::{update_map, delete_map, on_map_click, on_map_move});
     use_js!("js_utils/src/marker.ts", "assets/dioxus_leaflet.js"::{update_marker, delete_marker});
     use_js!("js_utils/src/polygon.ts", "assets/dioxus_leaflet.js"::{update_polygon, delete_polygon});
+    use_js!("js_utils/src/polyline.ts", "assets/dioxus_leaflet.js"::{update_polyline, delete_polyline});
     use_js!("js_utils/src/popup.ts", "assets/dioxus_leaflet.js"::{update_popup});
 }
 
@@ -23,7 +24,7 @@ fn js_to_eval(err: JsError) -> Box<dyn Error + Send + Sync> {
     }
 }
 
-pub async fn update_map<'a>(
+pub async fn update_map(
     id: &Id,
     initial_position: &MapPosition,
     options: &MapOptions,
@@ -33,25 +34,38 @@ pub async fn update_map<'a>(
         .map_err(js_to_eval)
 }
 
-pub async fn delete_map<'a>(id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
+pub async fn delete_map(id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
     js_api::delete_map(id).await.map_err(js_to_eval)
 }
 
-pub async fn on_map_click(map_id: &Id, callback: EventHandler<LatLng>) -> Result<(), Box<dyn Error + Send + Sync>> {
+pub async fn on_map_click(
+    map_id: &Id,
+    callback: EventHandler<LatLng>,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
     let mapper_cb = Callback::new(move |coords: Vec<f64>| async move {
         callback.call(LatLng::new(coords[0], coords[1]));
         Result::<(), SerdeJsonValue>::Ok(())
     });
-    js_api::on_map_click(map_id, mapper_cb).await.map_err(js_to_eval)
+    js_api::on_map_click(map_id, mapper_cb)
+        .await
+        .map_err(js_to_eval)
 }
 
-pub async fn on_map_move(map_id: &Id, callback: EventHandler<MapPosition>) -> Result<(), Box<dyn Error + Send + Sync>> {
+pub async fn on_map_move(
+    map_id: &Id,
+    callback: EventHandler<MapPosition>,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
     let mapper_cb = Callback::new(move |data: Vec<f64>| async move {
-        let pos = MapPosition { coordinates: LatLng::new(data[0], data[1]), zoom: data[2] };
+        let pos = MapPosition {
+            coordinates: LatLng::new(data[0], data[1]),
+            zoom: data[2],
+        };
         callback.call(pos);
         Result::<(), SerdeJsonValue>::Ok(())
     });
-    js_api::on_map_move(map_id, mapper_cb).await.map_err(js_to_eval)
+    js_api::on_map_move(map_id, mapper_cb)
+        .await
+        .map_err(js_to_eval)
 }
 
 pub async fn update_marker(
@@ -92,6 +106,27 @@ pub async fn update_polygon(
 
 pub async fn delete_polygon(polygon_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
     js_api::delete_polygon(polygon_id.parent().unwrap(), polygon_id.id())
+        .await
+        .map_err(js_to_eval)
+}
+
+pub async fn update_polyline(
+    polyline_id: &Id,
+    coordinates: &[Vec<LatLng>],
+    options: &PathOptions,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::update_polyline(
+        polyline_id.parent().unwrap(),
+        polyline_id.id(),
+        coordinates,
+        options,
+    )
+    .await
+    .map_err(js_to_eval)
+}
+
+pub async fn delete_polyline(polyline_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::delete_polyline(polyline_id.parent().unwrap(), polyline_id.id())
         .await
         .map_err(js_to_eval)
 }
