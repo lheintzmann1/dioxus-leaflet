@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Custom marker icon configuration
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

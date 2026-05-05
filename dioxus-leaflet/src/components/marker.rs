@@ -1,4 +1,7 @@
-use dioxus::{core::{use_drop, spawn_forever}, prelude::*};
+use dioxus::{
+    core::{spawn_forever, use_drop},
+    prelude::*,
+};
 use dioxus_logger::tracing::error;
 use std::{collections::HashMap, rc::Rc};
 

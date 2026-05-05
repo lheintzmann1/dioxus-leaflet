@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use color::{OpaqueColor, Srgb};
+use serde::{Deserialize, Serialize};
 
 pub type Color = OpaqueColor<Srgb>;
 
@@ -76,16 +76,22 @@ mod color_format {
     use serde::{Deserializer, Serializer};
 
     pub fn serialize<S>(color: &Color, serializer: S) -> Result<S::Ok, S::Error>
-    where S : Serializer {
+    where
+        S: Serializer,
+    {
         let color = color.to_rgba8();
-        serializer.serialize_str(&format!("rgb({r}, {g}, {b})",
+        serializer.serialize_str(&format!(
+            "rgb({r}, {g}, {b})",
             r = color.r,
             g = color.g,
-            b = color.b))
+            b = color.b
+        ))
     }
 
     pub fn deserialize<'de, D>(_: D) -> Result<Color, D::Error>
-    where D : Deserializer<'de> {
+    where
+        D: Deserializer<'de>,
+    {
         panic!("Deserializing colors not (yet) supported")
     }
 }

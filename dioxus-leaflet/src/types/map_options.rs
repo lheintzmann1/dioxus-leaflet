@@ -1,5 +1,5 @@
+use super::{LeafletResources, TileLayer};
 use serde::{Deserialize, Serialize};
-use super::{TileLayer, LeafletResources};
 
 /// Map configuration options
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

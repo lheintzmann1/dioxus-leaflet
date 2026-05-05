@@ -9,7 +9,11 @@ pub struct LatLng {
 
 impl LatLng {
     pub const fn new(lat: f64, lng: f64) -> Self {
-        Self { lat, lng, alt: None }
+        Self {
+            lat,
+            lng,
+            alt: None,
+        }
     }
 }
 
