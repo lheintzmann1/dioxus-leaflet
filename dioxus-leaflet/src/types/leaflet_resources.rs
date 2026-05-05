@@ -9,10 +9,7 @@ pub enum LeafletResources {
         base_url: Option<String>, // Allow custom CDN base URL
     },
     /// Use local files
-    Local {
-        css_path: String,
-        js_path: String,
-    },
+    Local { css_path: String, js_path: String },
 }
 
 impl LeafletResources {
@@ -68,9 +65,15 @@ impl LeafletResources {
             Self::Cdn { version, base_url } if base_url.is_none() => {
                 // Only provide integrity for unpkg.com with known versions
                 match version.as_str() {
-                    "1.9.4" => Some("sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=".to_string()),
-                    "1.9.3" => Some("sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=".to_string()),
-                    "1.9.2" => Some("sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=".to_string()),
+                    "1.9.4" => {
+                        Some("sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=".to_string())
+                    }
+                    "1.9.3" => {
+                        Some("sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=".to_string())
+                    }
+                    "1.9.2" => {
+                        Some("sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=".to_string())
+                    }
                     _ => None,
                 }
             }
@@ -84,9 +87,15 @@ impl LeafletResources {
             Self::Cdn { version, base_url } if base_url.is_none() => {
                 // Only provide integrity for unpkg.com with known versions
                 match version.as_str() {
-                    "1.9.4" => Some("sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=".to_string()),
-                    "1.9.3" => Some("sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=".to_string()),
-                    "1.9.2" => Some("sha256-o9N4PsYA2zOcVD5OHEHviWpTGQ4Q1jEzU7oJiE+zRCE=".to_string()),
+                    "1.9.4" => {
+                        Some("sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=".to_string())
+                    }
+                    "1.9.3" => {
+                        Some("sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=".to_string())
+                    }
+                    "1.9.2" => {
+                        Some("sha256-o9N4PsYA2zOcVD5OHEHviWpTGQ4Q1jEzU7oJiE+zRCE=".to_string())
+                    }
                     _ => None,
                 }
             }

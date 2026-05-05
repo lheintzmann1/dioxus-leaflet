@@ -1,5 +1,8 @@
 use crate::{LatLng, MapOptions, MapPosition, interop, types::Id};
-use dioxus::{core::{use_drop, spawn_forever}, prelude::*};
+use dioxus::{
+    core::{spawn_forever, use_drop},
+    prelude::*,
+};
 use std::rc::Rc;
 
 const MAP_CSS: Asset = asset!("/assets/dioxus_leaflet.scss");
@@ -53,7 +56,9 @@ pub fn Map(
         let pos = initial_position;
         let opts = options.clone();
         async move {
-            interop::update_map(&id, &pos, &opts).await.map_err(|e| e.to_string())
+            interop::update_map(&id, &pos, &opts)
+                .await
+                .map_err(|e| e.to_string())
         }
     });
 
@@ -63,8 +68,7 @@ pub fn Map(
         async move {
             if let Some(on_click) = on_click {
                 interop::on_map_click(&id, on_click).await
-            }
-            else {
+            } else {
                 Ok(())
             }
         }
@@ -76,8 +80,7 @@ pub fn Map(
         async move {
             if let Some(on_move) = on_move {
                 interop::on_map_move(&id, on_move).await
-            }
-            else {
+            } else {
                 Ok(())
             }
         }
