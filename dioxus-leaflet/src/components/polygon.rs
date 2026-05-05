@@ -1,4 +1,7 @@
-use dioxus::{core::use_drop, prelude::*};
+use dioxus::{
+    core::{spawn_forever, use_drop},
+    prelude::*,
+};
 use dioxus_logger::tracing::error;
 use std::rc::Rc;
 
@@ -30,7 +33,7 @@ pub fn Polygon(
     let id2 = id.clone();
     use_drop(move || {
         let id = id2.clone();
-        spawn(async move {
+        spawn_forever(async move {
             if let Err(e) = interop::delete_polygon(&id).await {
                 error!("{e}");
             }
