@@ -23,7 +23,7 @@ export async function update_popup(marker_id: Id, popup_id: Id, options: L.Popup
     }
     _popups.set(marker_id, { body, options });
 
-    let context = get_marker(marker_id) ?? get_polygon(marker_id);
+    let context = await get_marker(marker_id) ?? get_polygon(marker_id);
     if (context) {
         context.unbindPopup();
         context.bindPopup(body, options);

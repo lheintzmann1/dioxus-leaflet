@@ -23,15 +23,27 @@ pub fn Marker(
     let id = use_context_provider(|| Rc::new(Id::marker(&map, dioxus_core::current_scope_id().0)));
 
     let id2 = id.clone();
-    use_effect(move || {
+    use_resource(move || {
         let id = id2.clone();
         let coord = coordinate();
         let icon = icon();
-        spawn(async move {
+        async move {
             if let Err(e) = interop::update_marker(&id, &coord, &icon).await {
                 error!("Error rendering marker: {e}");
             }
-        });
+        }
+    });
+
+    let id2 = id.clone();
+    use_resource(move || {
+        let id = id2.clone();
+        async move {
+            if let Some(on_click) = on_click {
+                interop::on_marker_click(&id, on_click).await
+            } else {
+                Ok(())
+            }
+        }
     });
 
     let id2 = id.clone();
@@ -44,5 +56,8 @@ pub fn Marker(
         });
     });
 
-    rsx!({ children })
+    rsx!(
+        {children}
+
+    )
 }

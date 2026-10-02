@@ -11,7 +11,7 @@ mod js_api {
     use dioxus_use_js::use_js;
 
     use_js!("js_utils/src/map.ts", "assets/dioxus_leaflet.js"::{update_map, delete_map, on_map_click, on_map_move});
-    use_js!("js_utils/src/marker.ts", "assets/dioxus_leaflet.js"::{update_marker, delete_marker});
+    use_js!("js_utils/src/marker.ts", "assets/dioxus_leaflet.js"::{update_marker, on_marker_click, delete_marker});
     use_js!("js_utils/src/polygon.ts", "assets/dioxus_leaflet.js"::{update_polygon, delete_polygon});
     use_js!("js_utils/src/polyline.ts", "assets/dioxus_leaflet.js"::{update_polyline, delete_polyline});
     use_js!("js_utils/src/popup.ts", "assets/dioxus_leaflet.js"::{update_popup});
@@ -48,6 +48,19 @@ pub async fn on_map_click(
     });
     js_api::on_map_click(map_id, mapper_cb)
         .await
+        .map_err(js_to_eval)
+}
+
+pub async fn on_marker_click(
+    marker_id: &Id,
+    callback: EventHandler,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let marker_cb = Callback::new(move |_| async move {
+        callback.call(());
+        Result::<(), SerdeJsonValue>::Ok(())
+    });
+    js_api::on_marker_click(marker_id, marker_cb)
+        .await  
         .map_err(js_to_eval)
 }
 
