@@ -34,9 +34,6 @@ export async function update_marker(map_id: Id, marker_id: Id, coordinate: L.Lat
 
     marker.setLatLng(coordinate);
     if (icon) {
-        // Set non-null default values
-        icon.popupAnchor ??= [0, 0];
-        icon.tooltipAnchor ??= [0, 0];
         marker.setIcon(l.icon(icon));
     }
 
