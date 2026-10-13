@@ -40,5 +40,8 @@ pub fn Polygon(
         });
     });
 
-    rsx!({ children })
+    rsx!(
+        {children}
+
+    )
 }

@@ -311,31 +311,24 @@ Handle various map and marker events:
 
 ```rust
 fn App() -> Element {
-    let mut selected_marker = use_signal(|| None::<MapMarker>);
     let mut map_center = use_signal(|| MapPosition::default());
 
     rsx! {
         Map {
-            on_marker_click: move |marker| {
-                selected_marker.set(Some(marker));
+            on_click: move |position: LatLng| {
+                info!("Clicked at: {}, {}", position.lat, position.lng);
             },
-            on_map_click: move |position| {
-                println!("Clicked at: {}, {}", position.lat, position.lng);
-            },
-            on_map_move: move |position| {
+            on_move: move |position: MapPosition| {
+                info!("Map moved to: {:?}", pos);
                 map_center.set(position);
             },
-            // ... other props
-        }
-        
-        // Display selected marker info
-        if let Some(marker) = selected_marker.read().as_ref() {
-            div {
-                "Selected: {marker.title}"
-                if let Some(desc) = &marker.description {
-                    p { "{desc}" }
+            Marker {
+                on_click: move |_: ()| {
+                    info!("Clicked on a marker");
                 }
+                // ... other props
             }
+            // ... other props
         }
     }
 }

@@ -39,5 +39,8 @@ pub fn Polyline(
         });
     });
 
-    rsx!({ children })
+    rsx!(
+        {children}
+
+    )
 }
