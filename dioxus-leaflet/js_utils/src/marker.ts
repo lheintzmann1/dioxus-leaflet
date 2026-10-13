@@ -58,6 +58,7 @@ export async function on_marker_click(marker_id: Id, callback: RustCallback<void
     if (!marker) {
         throw new Error(`Marker with id ${marker_id} not found when setting onClick handler`);
     }
+    marker.off("click");
     marker.on("click", async (e: L.LeafletMouseEvent) => {
         try {
             await callback()
