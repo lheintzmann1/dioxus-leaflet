@@ -60,7 +60,7 @@ pub async fn on_marker_click(
         Result::<(), SerdeJsonValue>::Ok(())
     });
     js_api::on_marker_click(marker_id, marker_cb)
-        .await  
+        .await
         .map_err(js_to_eval)
 }
 

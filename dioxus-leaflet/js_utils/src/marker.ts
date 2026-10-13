@@ -59,9 +59,9 @@ export async function on_marker_click(marker_id: Id, callback: RustCallback<void
         throw new Error(`Marker with id ${marker_id} not found when setting onClick handler`);
     }
     marker.off("click");
-    marker.on("click", async (e: L.LeafletMouseEvent) => {
+    marker.on("click", async (_e: L.LeafletMouseEvent) => {
         try {
-            await callback()
+            await callback();
         } catch (error) {
             console.error("Error in on_marker_click callback:", error);
         }
@@ -75,11 +75,16 @@ export async function delete_marker(map_id: Id, marker_id: Id) {
         throw new Error(`Map with id ${map_id} not found when deleting marker ${marker_id}`);
     }
 
-    const marker = await get_marker(marker_id);
+    const marker = _markers.get(marker_id);
     if (!marker) {
-        throw new Error(`Marker with id ${marker_id} not found when deleting`);
+        // Marker not yet created, clear pending callbacks
+        if (_callbacks.has(marker_id)) {
+            _callbacks.delete(marker_id);
+            _promises.delete(marker_id);
+        }
+    } else {
+        map.removeLayer(marker);
+        _markers.delete(marker_id);
     }
 
-    map.removeLayer(marker);
-    _markers.delete(marker_id);
 }
