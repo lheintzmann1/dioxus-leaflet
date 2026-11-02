@@ -24,15 +24,19 @@ export async function update_map(map_id: Id, initial_position: MapPosition, opti
     const l = await setup();
 
     // Initialize the map with options
-    const map = _maps.get(map_id) ?? l.map(`dioxus-leaflet-map-${map_id}`, {
+    const map_options: L.MapOptions = {
         zoomControl: options.zoom_control,
         scrollWheelZoom: options.scroll_wheel_zoom,
         doubleClickZoom: options.double_click_zoom,
         touchZoom: options.touch_zoom,
         dragging: options.dragging,
         keyboard: options.keyboard,
-        attributionControl: options.attribution_control
-    });
+        attributionControl: options.attribution_control,
+    }
+    if (typeof(options.crs) === "string") {
+        map_options["crs"] = l.CRS[options.crs];
+    }
+    const map = _maps.get(map_id) ?? l.map(`dioxus-leaflet-map-${map_id}`, map_options);
 
     map.setView(initial_position.coordinates, initial_position.zoom);
 

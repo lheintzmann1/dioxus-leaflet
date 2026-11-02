@@ -19,6 +19,7 @@ export interface MapOptions {
     keyboard?: boolean,
     attribution_control?: boolean,
     tile_layer?: TileLayer,
+    crs?: L.CRS,
 }
 
 export interface TileLayer {
