@@ -8,7 +8,7 @@ mod popup_options;
 pub use popup_options::PopupOptions;
 
 mod map_options;
-pub use map_options::MapOptions;
+pub use map_options::{CRS, MapOptions};
 
 mod tile_layer;
 pub use tile_layer::TileLayer;

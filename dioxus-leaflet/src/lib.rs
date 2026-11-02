@@ -89,6 +89,6 @@ mod types;
 // Re-export main types and components
 pub use components::{Map, Marker, Polygon, Polyline, Popup};
 pub use types::{
-    Color, LatLng, LeafletResources, LineCap, LineJoin, MapOptions, MapPosition, MarkerIcon,
+    CRS, Color, LatLng, LeafletResources, LineCap, LineJoin, MapOptions, MapPosition, MarkerIcon,
     PathOptions, PopupOptions, TileLayer,
 };

@@ -1,6 +1,16 @@
 use super::{LeafletResources, TileLayer};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum CRS {
+    EPSG3395S,
+    EPSG3857,
+    EPSG4326,
+    EPSG900913,
+    Earth,
+    Simple,
+}
+
 /// Map configuration options
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MapOptions {
@@ -13,6 +23,7 @@ pub struct MapOptions {
     pub attribution_control: bool,
     pub tile_layer: Option<TileLayer>,
     pub leaflet_resources: LeafletResources,
+    pub crs: Option<CRS>,
 }
 
 impl Default for MapOptions {
@@ -27,6 +38,7 @@ impl Default for MapOptions {
             attribution_control: true,
             tile_layer: Some(TileLayer::default()),
             leaflet_resources: LeafletResources::default(),
+            crs: None,
         }
     }
 }
@@ -44,6 +56,7 @@ impl MapOptions {
             attribution_control: false,
             tile_layer: None,
             leaflet_resources: LeafletResources::default(),
+            crs: None,
         }
     }
 
@@ -104,6 +117,12 @@ impl MapOptions {
     /// Builder method to set Leaflet resources configuration
     pub fn with_leaflet_resources(mut self, resources: LeafletResources) -> Self {
         self.leaflet_resources = resources;
+        self
+    }
+
+    /// Builder method to set CRS
+    pub fn with_crs(mut self, crs: CRS) -> Self {
+        self.crs = Some(crs);
         self
     }
 }
