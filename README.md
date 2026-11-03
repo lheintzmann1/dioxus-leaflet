@@ -246,7 +246,7 @@ let options = MapOptions {
     dragging: true,
     keyboard: true,
     attribution_control: true,
-    tile_layer: TileLayer::satellite(), // Use satellite imagery
+    tile_layer: Some(TileLayer::satellite()), // Use satellite imagery (None for no tiles)
 };
 
 // Minimal configuration using builder pattern
@@ -254,7 +254,7 @@ let minimal_options = MapOptions::default()
     .with_double_click_zoom(false)
     .with_tile_layer(TileLayer::satellite());
 
-// All controls disabled
+// All controls disabled and no tile layer
 let disabled_options = MapOptions::minimal()
     .with_tile_layer(TileLayer::satellite());
 
@@ -280,7 +280,7 @@ rsx! {
 | `dragging` | `bool` | `true` | Enable/disable map dragging |
 | `keyboard` | `bool` | `true` | Enable/disable keyboard navigation |
 | `attribution_control` | `bool` | `true` | Show/hide attribution control |
-| `tile_layer` | `TileLayer` | OpenStreetMap | Tile layer configuration |
+| `tile_layer` | `Option<TileLayer>` | `Some(OpenStreetMap)` | Tile layer configuration (`None` for no tiles; `MapOptions::minimal()` has none) |
 | `leaflet_resources` | `LeafletResources` | CDN v1.9.4 | Leaflet CSS/JS resource configuration |
 
 ### Tile Layers
