@@ -1,6 +1,6 @@
 [package]
 name = "dioxus-leaflet"
-version = "0.4.0"
+version = "0.5.0"
 authors = [
     "Lucas Heintzmann <lheintzmann1@disroot.org>",
     "Steven Vergenz <1882376+stevenvergenz@users.noreply.github.com>",
