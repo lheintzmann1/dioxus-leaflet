@@ -39,9 +39,10 @@ fn App() -> Element {
                 info!("Map moved to: {:?}", pos);
             },
             for marker in markers() {
-                Marker { coordinate: marker.2,
+                Marker {
+                    coordinate: marker.2,
                     Popup {
-                        b { "{marker.0}" }
+                        b { "{marker.0}"}
                         br {}
                         "{marker.1}"
                     }
@@ -83,7 +84,11 @@ fn App() -> Element {
             onclick: move |_| {
                 if let Some(last) = markers().last() {
                     let new_lat_lng = last.2 + LatLng::new(0.5, 0.5);
-                    markers.write().push(("New City", "A new location", new_lat_lng));
+                    markers.write().push((
+                        "New City",
+                        "A new location",
+                        new_lat_lng
+                    ));
                 }
             },
             "Add Marker"
@@ -96,7 +101,6 @@ fn App() -> Element {
                 //         MarkerType::Circle { .. } => MarkerType::Pin,
                 //     };
                 // }
-                ();
             },
             "Switch Types"
         }
