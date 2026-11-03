@@ -18,7 +18,7 @@ export interface MapOptions {
     dragging?: boolean,
     keyboard?: boolean,
     attribution_control?: boolean,
-    tile_layer: TileLayer,
+    tile_layer?: TileLayer,
 }
 
 export interface TileLayer {

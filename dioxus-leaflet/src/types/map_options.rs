@@ -11,7 +11,7 @@ pub struct MapOptions {
     pub dragging: bool,
     pub keyboard: bool,
     pub attribution_control: bool,
-    pub tile_layer: TileLayer,
+    pub tile_layer: Option<TileLayer>,
     pub leaflet_resources: LeafletResources,
 }
 
@@ -25,14 +25,14 @@ impl Default for MapOptions {
             dragging: true,
             keyboard: true,
             attribution_control: true,
-            tile_layer: TileLayer::default(),
+            tile_layer: Some(TileLayer::default()),
             leaflet_resources: LeafletResources::default(),
         }
     }
 }
 
 impl MapOptions {
-    /// Creates a MapOptions with all controls disabled and default tile layer
+    /// Creates a MapOptions with all controls disabled and no tile layer
     pub fn minimal() -> Self {
         Self {
             zoom_control: false,
@@ -42,7 +42,7 @@ impl MapOptions {
             dragging: false,
             keyboard: false,
             attribution_control: false,
-            tile_layer: TileLayer::default(),
+            tile_layer: None,
             leaflet_resources: LeafletResources::default(),
         }
     }
@@ -91,7 +91,7 @@ impl MapOptions {
 
     /// Builder method to set tile layer
     pub fn with_tile_layer(mut self, tile_layer: TileLayer) -> Self {
-        self.tile_layer = tile_layer;
+        self.tile_layer = Some(tile_layer);
         self
     }
 
