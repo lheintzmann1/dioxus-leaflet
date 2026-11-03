@@ -95,6 +95,12 @@ impl MapOptions {
         self
     }
 
+    /// Builder method to remove the tile layer (e.g. for maps made only of image overlays)
+    pub fn without_tile_layer(mut self) -> Self {
+        self.tile_layer = None;
+        self
+    }
+
     /// Builder method to set Leaflet resources configuration
     pub fn with_leaflet_resources(mut self, resources: LeafletResources) -> Self {
         self.leaflet_resources = resources;
