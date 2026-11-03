@@ -1,13 +1,20 @@
 use super::{LeafletResources, TileLayer};
 use serde::{Deserialize, Serialize};
 
+/// Coordinate reference system, matching the names of Leaflet's `L.CRS.*` objects
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum CRS {
-    EPSG3395S,
+    /// World Mercator (`L.CRS.EPSG3395`)
+    EPSG3395,
+    /// Spherical Mercator, the default used by most tile providers (`L.CRS.EPSG3857`)
     EPSG3857,
+    /// Plate Carrée (`L.CRS.EPSG4326`)
     EPSG4326,
+    /// Alias of EPSG3857 (`L.CRS.EPSG900913`)
     EPSG900913,
+    /// Earth CRS (`L.CRS.Earth`)
     Earth,
+    /// Simple linear CRS for non-geographical maps, such as game maps (`L.CRS.Simple`)
     Simple,
 }
 
@@ -120,7 +127,7 @@ impl MapOptions {
         self
     }
 
-    /// Builder method to set CRS
+    /// Builder method to set the coordinate reference system (defaults to Leaflet's EPSG3857)
     pub fn with_crs(mut self, crs: CRS) -> Self {
         self.crs = Some(crs);
         self
