@@ -37,11 +37,13 @@ export async function update_map(map_id: Id, initial_position: MapPosition, opti
     map.setView(initial_position.coordinates, initial_position.zoom);
 
     // Add tile layer
-    l.tileLayer(options.tile_layer.url, {
-        attribution: options.tile_layer.attribution,
-        maxZoom: options.tile_layer.max_zoom,
-        subdomains: options.tile_layer.subdomains
-    }).addTo(map);
+    if (options.tile_layer) {
+        l.tileLayer(options.tile_layer.url, {
+            attribution: options.tile_layer.attribution,
+            maxZoom: options.tile_layer.max_zoom,
+            subdomains: options.tile_layer.subdomains
+        }).addTo(map);
+    }
 
     _maps.set(map_id, map);
 

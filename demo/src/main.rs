@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 use dioxus_leaflet::{
-    Color, LatLng, Map, MapOptions, MapPosition, Marker, PathOptions, Polygon, Polyline, Popup,
-    TileLayer,
+    Color, LatLng, Map, MapPosition, Marker, PathOptions, Polygon, Polyline, Popup,
 };
 
 mod jersey;
@@ -26,13 +25,10 @@ fn App() -> Element {
         ]]
     });
 
-    let options = use_signal(|| MapOptions::default().with_tile_layer(TileLayer::openstreetmap()));
-
     rsx! {
         document::Style { href: CSS }
         Map {
             initial_position: MapPosition::new(51.505, -0.09, 5.0),
-            options: options(),
             on_click: move |pos: LatLng| {
                 info!("Map clicked at: {:?}", pos);
                 if let Some(marker) = markers.write().last_mut() {
