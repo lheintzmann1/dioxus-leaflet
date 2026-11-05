@@ -22,5 +22,11 @@ pub use path_options::{Color, LineCap, LineJoin, PathOptions};
 mod latlng;
 pub use latlng::LatLng;
 
+mod image_overlay_options;
+pub use image_overlay_options::ImageOverlayOptions;
+
+mod latlngbounds;
+pub use latlngbounds::LatLngBounds;
+
 mod id;
 pub use id::*;

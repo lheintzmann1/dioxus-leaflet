@@ -3,3 +3,4 @@ export * from "./marker";
 export * from "./popup";
 export * from "./polygon";
 export * from "./polyline";
+export * from "./imageoverlay";

@@ -87,8 +87,8 @@ mod interop;
 mod types;
 
 // Re-export main types and components
-pub use components::{Map, Marker, Polygon, Polyline, Popup};
+pub use components::{ImageOverlay, Map, Marker, Polygon, Polyline, Popup};
 pub use types::{
-    CRS, Color, LatLng, LeafletResources, LineCap, LineJoin, MapOptions, MapPosition, MarkerIcon,
-    PathOptions, PopupOptions, TileLayer,
+    CRS, Color, ImageOverlayOptions, LatLng, LatLngBounds, LeafletResources, LineCap, LineJoin,
+    MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, TileLayer,
 };
