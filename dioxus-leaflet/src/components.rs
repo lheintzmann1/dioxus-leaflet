@@ -12,3 +12,6 @@ pub use polyline::Polyline;
 
 mod popup;
 pub use popup::Popup;
+
+mod image_overlay;
+pub use image_overlay::ImageOverlay;

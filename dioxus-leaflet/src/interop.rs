@@ -2,7 +2,10 @@ use dioxus::prelude::*;
 use dioxus_use_js::{JsError, SerdeJsonValue};
 use std::error::Error;
 
-use crate::{LatLng, MapOptions, MapPosition, MarkerIcon, PathOptions, PopupOptions, types::Id};
+use crate::{
+    ImageOverlayOptions, LatLng, LatLngBounds, MapOptions, MapPosition, MarkerIcon, PathOptions,
+    PopupOptions, types::Id,
+};
 
 pub const DL_JS: Asset = asset!("/assets/dioxus_leaflet.js");
 
@@ -15,6 +18,7 @@ mod js_api {
     use_js!("js_utils/src/polygon.ts", "assets/dioxus_leaflet.js"::{update_polygon, delete_polygon});
     use_js!("js_utils/src/polyline.ts", "assets/dioxus_leaflet.js"::{update_polyline, delete_polyline});
     use_js!("js_utils/src/popup.ts", "assets/dioxus_leaflet.js"::{update_popup});
+    use_js!("js_utils/src/imageoverlay.ts", "assets/dioxus_leaflet.js"::{update_imageoverlay, delete_imageoverlay});
 }
 
 fn js_to_eval(err: JsError) -> Box<dyn Error + Send + Sync> {
@@ -150,6 +154,29 @@ pub async fn update_popup(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let marker_id = popup_id.parent().unwrap();
     js_api::update_popup(marker_id, popup_id, options)
+        .await
+        .map_err(js_to_eval)
+}
+
+pub async fn update_imageoverlay(
+    imageoverlay_id: &Id,
+    image_url: &str,
+    bounds: &LatLngBounds,
+    options: &ImageOverlayOptions,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::update_imageoverlay(
+        imageoverlay_id.parent().unwrap(),
+        imageoverlay_id.id(),
+        image_url,
+        bounds,
+        options,
+    )
+    .await
+    .map_err(js_to_eval)
+}
+
+pub async fn delete_imageoverlay(imageoverlay_id: &Id) -> Result<(), Box<dyn Error + Send + Sync>> {
+    js_api::delete_imageoverlay(imageoverlay_id.parent().unwrap(), imageoverlay_id.id())
         .await
         .map_err(js_to_eval)
 }
