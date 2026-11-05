@@ -28,3 +28,8 @@ export interface TileLayer {
     max_zoom: number,
     subdomains: string[],
 }
+
+export interface LatLngBounds {
+    southwest: [number, number],
+    northeast: [number, number],
+}

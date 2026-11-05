@@ -305,6 +305,42 @@ let custom_tiles = TileLayer {
 };
 ```
 
+### Overlay Layers
+
+You can add overlays to the maps:
+
+```rust
+use dioxus_leaflet::{ImageOverlay, ImageOverlayOptions, LatLngBounds, LatLng};
+
+// Full configuration with all options specified
+let options = ImageOverlayOptions {
+    opacity: Some(1.0),
+    alt: Some("Your own image description"),
+    interactive: Some(false),
+    cross_origin: Some(false),
+    error_overlay_url: Some("/404"),
+    z_index: Some(1),
+    class_name: Some("overlay"),
+    decoding: Some("auto"),
+};
+
+// Use default configuration
+let mut default_options = ImageOverlayOptions::default(); // All options set to sensible defaults
+
+// Or overwrite specific settings
+let modified_options = default_options.with_opacity(0.7);
+
+rsx! {
+    Map {
+        ImageOverlay {
+            image_url: "image.jpeg",
+            bounds: LatLngBounds::new(LatLng::new(0.0, 1.0), LatLng::new(1.0, 0.0)),
+            options: options,
+        }
+    }
+}
+```
+
 ## Event Handling
 
 Handle various map and marker events:
