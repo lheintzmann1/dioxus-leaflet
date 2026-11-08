@@ -30,6 +30,6 @@ export interface TileLayer {
 }
 
 export interface LatLngBounds {
-    southwest: [number, number],
-    northeast: [number, number],
+    southwest: L.LatLngLiteral,
+    northeast: L.LatLngLiteral,
 }
