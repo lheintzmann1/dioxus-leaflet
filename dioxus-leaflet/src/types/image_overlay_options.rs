@@ -1,35 +1,40 @@
 use serde::{Deserialize, Serialize};
 
+/// Options for an [`ImageOverlay`](crate::ImageOverlay).
 ///
-/// All options for the ImageOverlay
-/// As of 1.8 only opacity is supported
+/// Every field is optional: unset (`None`) fields are not sent to Leaflet, which then
+/// applies its own default. See <https://leafletjs.com/reference.html#imageoverlay>.
 ///
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// `opacity` and `z_index` are applied live when they change; the other options only
+/// take effect when the overlay is first created.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageOverlayOptions {
+    /// Opacity of the image, between 0 and 1.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub opacity: Option<f64>,
+    /// Text for the `alt` attribute of the image (accessibility).
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<String>,
+    /// Whether the overlay handles pointer events.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interactive: Option<bool>,
+    /// Whether the `crossOrigin` attribute is set on the image.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cross_origin: Option<bool>,
+    /// URL of an image to show if the main image fails to load.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub error_overlay_url: Option<String>,
+    /// The explicit z-index of the overlay.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub z_index: Option<i32>,
+    /// A custom CSS class name for the image element.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub class_name: Option<String>,
+    /// The `decoding` hint for the image (`"sync"`, `"async"` or `"auto"`).
+    /// Requires Leaflet 1.9 or later.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub decoding: Option<String>,
-}
-
-impl Default for ImageOverlayOptions {
-    fn default() -> Self {
-        Self {
-            opacity: Some(1.0),
-            alt: Some(String::new()),
-            interactive: Some(false),
-            cross_origin: Some(false),
-            error_overlay_url: Some(String::new()),
-            z_index: Some(1),
-            class_name: Some(String::new()),
-            decoding: Some(String::from("auto")),
-        }
-    }
 }
 
 impl ImageOverlayOptions {

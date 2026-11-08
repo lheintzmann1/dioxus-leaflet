@@ -1,11 +1,15 @@
 use dioxus::prelude::*;
 use dioxus_leaflet::{
-    Color, LatLng, Map, MapPosition, Marker, PathOptions, Polygon, Polyline, Popup,
+    Color, ImageOverlay, ImageOverlayOptions, LatLng, LatLngBounds, Map, MapPosition, Marker,
+    PathOptions, Polygon, Polyline, Popup,
 };
 
 mod jersey;
 
 const CSS: Asset = asset!("/assets/demo.scss");
+
+/// A simple inline SVG used as an image overlay example.
+const OVERLAY_IMAGE: &str = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='120'><rect width='200' height='120' fill='orange'/><text x='100' y='65' font-size='24' text-anchor='middle' fill='white'>Overlay</text></svg>";
 
 #[component]
 fn App() -> Element {
@@ -24,6 +28,8 @@ fn App() -> Element {
             LatLng::new(52.52, 13.4),
         ]]
     });
+
+    let mut overlay_opacity = use_signal(|| 0.7);
 
     rsx! {
         document::Style { href: CSS }
@@ -48,6 +54,11 @@ fn App() -> Element {
                     }
                 }
             }
+            ImageOverlay {
+                image_url: OVERLAY_IMAGE,
+                bounds: LatLngBounds::new(LatLng::new(50.0, -2.0), LatLng::new(52.0, 3.0)),
+                options: ImageOverlayOptions::default().with_opacity(overlay_opacity()),
+            }
             Polyline {
                 coordinates: route,
                 options: PathOptions {
@@ -71,6 +82,18 @@ fn App() -> Element {
                     "Jersey"
                 }
             }
+        }
+        input {
+            r#type: "range",
+            min: "0",
+            max: "1",
+            step: "0.1",
+            value: "{overlay_opacity}",
+            oninput: move |e| {
+                if let Ok(v) = e.value().parse() {
+                    overlay_opacity.set(v);
+                }
+            },
         }
         button {
             onclick: move |_| {

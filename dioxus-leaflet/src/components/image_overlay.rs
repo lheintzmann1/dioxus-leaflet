@@ -6,12 +6,12 @@ use crate::{
 };
 use dioxus::{core::spawn_forever, prelude::*};
 
+/// An image displayed over a geographic area of the map.
 #[component]
 pub fn ImageOverlay(
     image_url: ReadSignal<String>,
     bounds: ReadSignal<LatLngBounds>,
-    #[props(default = ImageOverlayOptions::default())] options: ImageOverlayOptions,
-    children: Element,
+    #[props(default)] options: ReadSignal<ImageOverlayOptions>,
 ) -> Element {
     let map: Rc<Id> = use_context();
     let id = use_context_provider(|| {
@@ -21,12 +21,12 @@ pub fn ImageOverlay(
     let id2 = id.clone();
     use_resource(move || {
         let id = id2.clone();
-        let image_url = image_url.cloned();
-        let bounds = bounds.cloned();
-        let options = options.clone();
+        let image_url = image_url();
+        let bounds = bounds();
+        let options = options();
         async move {
             if let Err(e) = interop::update_imageoverlay(&id, &image_url, &bounds, &options).await {
-                error!("Error rendering imageoverlay: {e}");
+                error!("Error rendering image overlay: {e}");
             }
         }
     });
@@ -41,8 +41,5 @@ pub fn ImageOverlay(
         });
     });
 
-    rsx!(
-        {children}
-
-    )
+    rsx! {}
 }
